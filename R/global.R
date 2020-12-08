@@ -1,4 +1,9 @@
 initialize_progress <- function(...) {
+  command_args <- commandArgs()
+  if ("--interactive" %in% command_args) {
+    stop("This command must be run in an R script that is either sourced or run via 'Rscript' in the terminal.")
+  }
+
   cl_pid <- Sys.getpid()
   cat(sprintf("#!id:%i", cl_pid), sep = "\n")
 
@@ -31,4 +36,22 @@ log_progress <- function(..., cluster_pid = "cl_pid") {
       paste(sprintf("%s=%s", names(call_args$...), call_args$...), collapse = ",")),
     sep = "\n"
   )
+}
+
+run_and_log <- function(script) {
+  if (!is.character(script)) {
+    stop("'script' must be a character string with the path to a .R file relative to
+         the current working directory.")
+  }
+
+  if (!file.exists(script)) {
+    cat(dir(), sep = "\n")
+    stop(sprintf("%s not found. Above are the contents of your current working directory.", script))
+  }
+
+  if (!grepl(".R", script)) {
+    if(!askYesNo("'script' should be a .R file, continue anyway?")) {
+      return(NULL)
+    }
+  }
 }
