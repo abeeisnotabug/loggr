@@ -2,10 +2,11 @@ Package: loggr
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Author: Maximilian Bee
+Maintainer: Maximilian Bee <richard.maximilian.bee@fsu-jena.de>
+Description: Leightweight function and Shiny App to logg progress in
+  simulations run via doParallel or any package that can redirect output
+  in loops to a logfile.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

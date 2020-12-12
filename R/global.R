@@ -1,5 +1,7 @@
 initialize_progress <- function(...) {
-  if ("--interactive" %in% commandArgs()) {
+  command_args <- commandArgs()
+
+  if ("--interactive" %in% command_args) {
     stop("This command must be run in an R script that is either sourced or run via 'Rscript' in the terminal.")
   }
 
@@ -11,6 +13,15 @@ initialize_progress <- function(...) {
 
   script_pid <- Sys.getpid()
 
+  if ("-e" %in% command_args) {
+    Rscript <- FALSE
+  } else {
+    file_name <- basename(command_args[grepl("--file", command_args)])
+    simu_name <- substring(command_args[grepl("--simu_name", command_args)], 13)
+
+    Rscript <- TRUE
+  }
+
   cat(
     sprintf(
       "#!id;%s;%i",
@@ -20,7 +31,7 @@ initialize_progress <- function(...) {
     sep = "\n"
   )
 
-  cat(sprintf("#!cmd;%s", paste(list(commandArgs()))),  sep = "\n")
+  cat(sprintf("#!cmd;%s", paste(list(command_args))),  sep = "\n")
 
   cat(
     sprintf(
@@ -40,19 +51,32 @@ initialize_progress <- function(...) {
 
   list(
     script_pid = script_pid,
-    outfile = commandArgs(trailingOnly = TRUE)
+    outfile = ifelse(
+      Rscript,
+      file.path(loggr::log_folder, simu_name, paste0(file_name, "-cluster.log")),
+      paste0(script_pid, "-cluster.log")
+    ),
+    simu_name = ifelse(
+      Rscript,
+      simu_name,
+      FALSE
+    )
   )
 }
 
-log_progress <- function(..., loggr_object) {
+log_progress <- function(..., loggr_object, expr) {
   call_args <- as.list(match.call(expand.dots = FALSE))
   iterators <- list(...)
 
-  write(
-    sprintf(
-      "#!iter;%s;%i-%i;%s",
+  to_write <- quote(
+    paste0(
+      "#!iter;",
+      timepoint,
+      ";",
       format(Sys.time(), "%y.%m.%d-%H.%M.%OS6"),
-      loggr_object$script_pid, Sys.getpid(),
+      ";",
+      loggr_object$script_pid, "-", Sys.getpid(),
+      ";",
       if (is.null(names(call_args$...))) {
         paste(
           sprintf(
@@ -91,14 +115,36 @@ log_progress <- function(..., loggr_object) {
           collapse = ","
         )
       }
-    ),
-    file = paste0("p", loggr_object$script_pid, "w", Sys.getpid(), ".log")
+    )
   )
+
+  out_file <- ifelse(
+    isFALSE(loggr_object$simu_name),
+    paste0("p", loggr_object$script_pid, "w", Sys.getpid(), ".log"),
+    file.path(
+      loggr::log_folder,
+      loggr_object$simu_name,
+      paste0("p", loggr_object$script_pid, "w", Sys.getpid(), ".log")
+    )
+  )
+
+  write(
+    with(list(timepoint = "start"), eval(to_write)),
+    file = out_file,
+    append = TRUE
+  )
+
+  result <- eval(substitute(expr, env = globalenv()))
+
+  write(
+    with(list(timepoint = "end"), eval(to_write)),
+    file = out_file
+  )
+
+  result
 }
 
 run_and_log <- function(simu_name, ..., append = FALSE) {
-  log_folder <- "/data/sim/_shared/simu_logs"
-
   ##### Exception handling #####
   if (missing(simu_name)) {
     stop("A simulation name must be supplied.")
@@ -135,12 +181,12 @@ The ... must be paths to .R files relative to the current working directory.",
     }
   }
 
-  if (!file.exists(log_folder)) {
-    dir.create(log_folder)
+  if (!file.exists(loggr::log_folder)) {
+    dir.create(loggr::log_folder)
   }
 
-  if (!file.exists(file.path(log_folder, simu_name))) {
-    dir.create(file.path(log_folder, simu_name))
+  if (!file.exists(file.path(loggr::log_folder, simu_name))) {
+    dir.create(file.path(loggr::log_folder, simu_name))
   } else if (!append) {
     overwrite <- askYesNo(
       sprintf("The directory %s already exists. Overwrite the current directory?
@@ -150,12 +196,13 @@ The ... must be paths to .R files relative to the current working directory.",
     if (is.na(overwrite)) {
       return(NULL)
     } else if (overwrite) {
-      unlink(file.path(log_folder, simu_name), recursive = TRUE)
+      unlink(file.path(loggr::log_folder, simu_name), recursive = TRUE)
 
-      dir.create(file.path(log_folder, simu_name))
+      dir.create(file.path(loggr::log_folder, simu_name))
     }
   }
 
+  ##### Execute Scripts and log in log_folder #####
   sapply(
     scripts,
     function(script) {
@@ -163,17 +210,17 @@ The ... must be paths to .R files relative to the current working directory.",
 
       system(
         sprintf(
-          "nohup Rscript --vanilla %s %s > %s 2> %s & echo $!",
+          "nohup Rscript --vanilla %s --simu_name=%s > %s 2> %s & echo $!",
           script,
-          file.path(log_folder, simu_name, paste(basename(script), "cluster.log", collapse = "-")),
+          simu_name,
           sprintf(
             "%s-%s.out",
-            file.path(log_folder, simu_name, basename(script)),
+            file.path(loggr::log_folder, simu_name, basename(script)),
             call_time
           ),
           sprintf(
             "%s-%s.err",
-            file.path(log_folder, simu_name, basename(script)),
+            file.path(loggr::log_folder, simu_name, basename(script)),
             call_time
           )
         ),
