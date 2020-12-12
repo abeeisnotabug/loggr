@@ -1,3 +1,4 @@
-shiny::shinyServer(function(input, output) {
-
-})
+function(input, output, session) {
+  # serverMonitorModuleServer()
+  simuMonitorModuleServer("simuMonitorModule")
+}

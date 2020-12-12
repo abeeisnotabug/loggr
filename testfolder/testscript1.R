@@ -12,7 +12,7 @@ foreach(type = c("u", "v")) %:%
         prior = TRUE, type, i, j,
         loggr_object = loggr_object,
         expr = {
-          Sys.sleep(10)
+          Sys.sleep(2)
         }
       )
     }
