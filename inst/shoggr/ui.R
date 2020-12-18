@@ -11,17 +11,19 @@ shinydashboard::dashboardPage(
     width = 260,
     shinydashboard::sidebarMenu(
       id = "tabs",
-      # shinydashboard::menuItem(
-      #   text = "Server Monitor",
-      #   tabName = "serverMonitor",
-      #   icon = icon("dashboard"),
-      #   selected = TRUE
-      # ),
       shinydashboard::menuItem(
-        text = "Simulations",
+        text = "Server Monitor",
+        tabName = "serverMonitor",
+        icon = icon("dashboard"),
+        selected = TRUE
+      ),
+      shinydashboard::menuItem(
+        text = "Progress",
         tabName = "simuMonitor",
         icon = icon("database")
-      )
+      ),
+      hr(),
+      simuPickerModuleUI("sidebarSimuPicker")
     )
   ),
 

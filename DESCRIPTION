@@ -7,6 +7,9 @@ Maintainer: Maximilian Bee <richard.maximilian.bee@fsu-jena.de>
 Description: Leightweight function and Shiny App to logg progress in
   simulations run via doParallel or any package that can redirect output
   in loops to a logfile.
+Imports: stringr, shinydashboard, shinyWidgets
+Depends: shiny
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 7.1.1
