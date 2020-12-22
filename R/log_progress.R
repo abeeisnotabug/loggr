@@ -20,6 +20,8 @@ log_progress <- function(..., loggr_object, expr) {
       ";",
       format(Sys.time(), "%y.%m.%d-%H.%M.%OS6"),
       ";",
+      loggr_object$iterator,
+      ";",
       loggr_object$script_pid, "-", Sys.getpid(),
       ";",
       paste(

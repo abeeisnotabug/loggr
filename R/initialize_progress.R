@@ -49,6 +49,7 @@ initialize_progress <- function(...) {
       Rscript,
       simu_name,
       FALSE
-    )
+    ),
+    iterator = iterators::icount()
   )
 }
