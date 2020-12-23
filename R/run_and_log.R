@@ -40,8 +40,10 @@ The ... must be paths to .R files relative to the current working directory.",
     dir.create(loggr::log_folder)
   }
 
-  if (!file.exists(file.path(loggr::log_folder, simu_name))) {
-    dir.create(file.path(loggr::log_folder, simu_name))
+  simu_log_folder_path <- file.path(loggr::log_folder, simu_name)
+
+  if (!file.exists(simu_log_folder_path)) {
+    dir.create(simu_log_folder_path)
   } else if (!append) {
     overwrite <- askYesNo(
       sprintf(
@@ -53,8 +55,9 @@ The ... must be paths to .R files relative to the current working directory.",
     if (is.na(overwrite)) {
       return(NULL)
     } else if (overwrite) {
-      unlink(file.path(loggr::log_folder, simu_name), recursive = TRUE)
-      dir.create(file.path(loggr::log_folder, simu_name))
+      unlink(simu_log_folder_path, recursive = TRUE)
+      dir.create(simu_log_folder_path)
+      # dir.create(file.path(simu_log_folder_path, "exception_dumps"))
     }
   }
 
@@ -62,6 +65,6 @@ The ... must be paths to .R files relative to the current working directory.",
   sapply(
     scripts,
     loggr:::make_Rscript_call,
-    simu_name
+    simu_log_folder_path
   )
 }

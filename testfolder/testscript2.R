@@ -13,6 +13,7 @@ foreach(type = c("w", "x")) %:%
         loggr_object = loggr_object,
         expr = {
           Sys.sleep(2)
+          log(rnorm(1))
         }
       )
     }

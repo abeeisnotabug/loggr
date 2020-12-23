@@ -12,44 +12,44 @@ initialize_progress <- function(...) {
     stop("All arguments must be named with format iterator_name = iterator_values.")
   }
 
-  script_pid <- Sys.getpid()
+  parent_id <- Sys.getpid()
 
   if ("-e" %in% command_args) {
-    Rscript <- FALSE
+    rscript <- FALSE
   } else {
-    file_name <- basename(substring(command_args[grepl("--file", command_args)], 8))
-    simu_name <- substring(command_args[grepl("--simu_name", command_args)], 13)
+    rscript_file_name <- basename(substring(command_args[grepl("--file", command_args)], 8))
+    simu_log_folder_path <- substring(command_args[grepl("--simu_log_folder_path", command_args)], 24)
 
-    Rscript <- TRUE
+    rscript <- TRUE
   }
 
-  loggr:::cat_id(script_pid)
+  log_folder_path <- ifelse(
+    rscript,
+    simu_log_folder_path,
+    "."
+  )
 
-  loggr:::cat_cmd(command_args)
+  log_files_prefix <- ifelse(
+    rscript,
+    paste0(
+      parent_id,
+      "-", format(Sys.time(), "%y.%m.%d-%H.%M.%OS6"),
+      "-", rscript_file_name
+    ),
+    paste0(
+      parent_id,
+      "-", format(Sys.time(), "%y.%m.%d-%H.%M.%OS6")
+    )
+  )
 
-  loggr:::cat_vars(script_pid, iterator_variables)
+  cat(loggr:::make_cat_prefix("id", parent_id), sep = "\n")
+  cat(sprintf("#!cmd;%s", paste(list(command_args))),  sep = "\n")
+  cat(loggr:::paste_vars(iterator_variables), sep = "\n")
 
   list(
-    script_pid = script_pid,
-    outfile = ifelse(
-      Rscript,
-      file.path(
-        loggr::log_folder,
-        simu_name,
-        paste0(
-          script_pid,
-          "-", format(Sys.time(), "%y.%m.%d-%H.%M.%OS6"),
-          "-", file_name,
-          "-cluster.log"
-        )
-      ),
-      paste0(script_pid, "-cluster.log")
-    ),
-    simu_name = ifelse(
-      Rscript,
-      simu_name,
-      FALSE
-    ),
+    parent_id = parent_id,
+    outfile = file.path(log_folder_path, paste0(log_files_prefix, "-cluster.log")),
+    log_folder_path = ifelse(rscript, log_folder_path, FALSE),
     iterator = iterators::icount()
   )
 }
