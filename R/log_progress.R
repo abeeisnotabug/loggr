@@ -36,7 +36,7 @@ log_progress <- function(..., loggr_object, expr) {
 
   to_write <- quote(
     paste0(
-      loggr:::make_cat_prefix(timepoint, parent_id = loggr_object$parent_id, worker_id), ";",
+      loggr:::make_cat_prefix(timepoint, loggr_object$parent_id, worker_id, loggr_object$call_time), ";",
       variables
     )
   )
@@ -52,14 +52,14 @@ log_progress <- function(..., loggr_object, expr) {
   result <- try(withCallingHandlers(
     eval(substitute(expr, env = globalenv())),
     error = function(e) {
-      loggr:::logg_condition(e, parent_id = loggr_object$parent_id, worker_id, variables, log_file_names$err)
+      loggr:::logg_condition(e, loggr_object$parent_id, worker_id, variables, log_file_names$err)
     },
     warning = function(w) {
-      loggr:::logg_condition(w, parent_id = loggr_object$parent_id, worker_id, variables, log_file_names$err)
+      loggr:::logg_condition(w, loggr_object$parent_id, worker_id, variables, log_file_names$err)
       invokeRestart("muffleWarning")
     },
     message = function(m) {
-      loggr:::logg_condition(m, parent_id = loggr_object$parent_id, worker_id, variables, log_file_names$err)
+      loggr:::logg_condition(m, loggr_object$parent_id, worker_id, variables, log_file_names$err)
     }
   ), silent = TRUE)
 
