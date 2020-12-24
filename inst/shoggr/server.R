@@ -1,5 +1,5 @@
 function(input, output, session) {
-  # serverMonitorModuleServer()
   simuMonitorModuleServer("simuMonitorModule")
   simuPickerModuleServer("sidebarSimuPicker")
+  serverMonitorModuleServer("serverMonitorModule")
 }

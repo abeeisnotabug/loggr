@@ -43,6 +43,9 @@ shinydashboard::dashboardPage(
     shinydashboard::tabItems(
       shinydashboard::tabItem(
         tabName = "simuMonitor", simuMonitorModuleUI("simuMonitorModule")
+      ),
+      shinydashboard::tabItem(
+        tabName = "serverMonitor", serverMonitorModuleUI("serverMonitorModule")
       )
     )
   )

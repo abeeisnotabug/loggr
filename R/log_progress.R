@@ -36,7 +36,7 @@ log_progress <- function(..., loggr_object, expr) {
 
   to_write <- quote(
     paste0(
-      loggr:::make_cat_prefix(timepoint, loggr_object$parent_id, worker_id, loggr_object$call_time), ";",
+      loggr:::make_cat_prefix(timepoint, loggr_object$parent_id, worker_id), ";",
       variables
     )
   )

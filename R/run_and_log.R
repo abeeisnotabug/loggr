@@ -47,7 +47,9 @@ The ... must be paths to .R files relative to the current working directory.",
   } else if (!append) {
     overwrite <- askYesNo(
       sprintf(
-"The directory %s already exists. Overwrite the current directory (Chosing 'No' will append to the existing files)?",
+"The directory %s already exists.
+Overwrite the current directory?
+(Chosing 'No' will append to the existing files)",
         simu_name
       )
     )

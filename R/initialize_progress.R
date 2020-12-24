@@ -29,21 +29,24 @@ initialize_progress <- function(...) {
     "."
   )
 
-  log_files_prefix <- paste0(
+  cluster_log_file <- paste0(
+    "c-",
     call_time,
     "-", parent_id,
-    ifelse(rscript, paste0("-", rscript_file_name), "")
+    ifelse(rscript, paste0("-", rscript_file_name), ""),
+    ".out"
   )
 
-  cat(loggr:::make_cat_prefix("id", parent_id, call_time), sep = "\n")
+  cat(loggr:::make_cat_prefix("id", parent_id, worker_id = NULL, call_time), sep = "\n")
   cat(sprintf("#!cmd;%s", paste(list(command_args))),  sep = "\n")
   cat(loggr:::paste_vars(iterator_variables), sep = "\n")
 
   list(
     parent_id = parent_id,
-    outfile = file.path(log_folder_path, paste0(log_files_prefix, "-cluster.log")),
+    outfile = file.path(log_folder_path, cluster_log_file),
     call_time = call_time,
     log_folder_path = ifelse(rscript, log_folder_path, FALSE),
+    rscript_file_name = rscript_file_name,
     iterator = iterators::icount()
   )
 }
