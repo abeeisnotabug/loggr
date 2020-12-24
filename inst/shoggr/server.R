@@ -1,5 +1,7 @@
 function(input, output, session) {
-  simuMonitorModuleServer("simuMonitorModule")
-  simuPickerModuleServer("sidebarSimuPicker")
+  logFolderContents <- checkLogFolderContentServer("checkLogFolder")
+
+  # simuMonitorModuleServer("simuMonitorModule")
+  simuPickerModuleServer("sidebarSimuPicker", logFolderContents)
   serverMonitorModuleServer("serverMonitorModule")
 }

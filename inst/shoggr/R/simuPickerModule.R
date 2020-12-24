@@ -1,20 +1,26 @@
 simuPickerModuleUI <- function(id) {
   ns <- NS(id)
 
-  uiOutput(ns("simuPickerUI"))
+  tagList(
+    shinyWidgets::pickerInput(
+      inputId = ns("simuPicker"),
+      label = "Pick a Simulation",
+      choices = dir(loggr::log_folder),
+      options = list(`live-search` = TRUE)
+    )
+  )
+  
 }
 
-simuPickerModuleServer <- function(id) {
+simuPickerModuleServer <- function(id, logFolderContents) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$simuPickerUI <- renderUI({
-        ns <- session$ns
-        shinyWidgets::pickerInput(
-          ns("simuPicker"),
-          label = "Pick a Simulation",
-          choices = dir(loggr::log_folder),
-          options = list(`live-search` = TRUE)
+      observeEvent(logFolderContents(), ignoreInit = TRUE, {
+        shinyWidgets::updatePickerInput(
+          session = session,
+          inputId = "simuPicker",
+          choices = logFolderContents()
         )
       })
     }

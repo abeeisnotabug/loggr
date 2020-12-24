@@ -41,9 +41,9 @@ shinydashboard::dashboardPage(
     shinyjs::useShinyjs(),
     shinybusy::use_busy_bar(color = "#FFFFFF"),
     shinydashboard::tabItems(
-      shinydashboard::tabItem(
-        tabName = "simuMonitor", simuMonitorModuleUI("simuMonitorModule")
-      ),
+      # shinydashboard::tabItem(
+      #   tabName = "simuMonitor", simuMonitorModuleUI("simuMonitorModule")
+      # ),
       shinydashboard::tabItem(
         tabName = "serverMonitor", serverMonitorModuleUI("serverMonitorModule")
       )
