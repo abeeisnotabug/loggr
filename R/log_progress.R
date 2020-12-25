@@ -13,31 +13,15 @@ log_progress <- function(..., loggr_object, expr) {
     )
   )
 
-  variables <- paste0(
-    "iteration_counter=", loggr_object$iterator$nextElem(), ";",
-    paste(
-      sprintf(
-        "%s=%s",
-        if (is.null(names(call_args$...))) {
-          call_args$...
-        } else {
-          append(
-            as.list(names(call_args$...)[names(call_args$...) != ""]),
-            call_args$...[names(call_args$...) == ""]
-          )
-        },
-        iterator_values
-      ),
-      collapse = ","
-    )
-  )
+  iterator_variables <- c(loggr_object$iterator$nextElem(), iterator_values)
+  names(iterator_variables) <- c("iterationCounter", make_iterator_variable_names(call_args$...))
 
   worker_id <- Sys.getpid()
 
   to_write <- quote(
     paste0(
-      loggr:::make_cat_prefix(timepoint, loggr_object$parent_id, worker_id), ";",
-      variables
+      make_cat_prefix(timepoint),
+      paste_vars(iterator_variables, loggr_object$parent_id, worker_id)
     )
   )
 
@@ -52,14 +36,14 @@ log_progress <- function(..., loggr_object, expr) {
   result <- try(withCallingHandlers(
     eval(substitute(expr, env = globalenv())),
     error = function(e) {
-      loggr:::logg_condition(e, loggr_object$parent_id, worker_id, variables, log_file_names$err)
+      logg_condition(e, loggr_object$parent_id, worker_id, iterator_variables, log_file_names$err)
     },
     warning = function(w) {
-      loggr:::logg_condition(w, loggr_object$parent_id, worker_id, variables, log_file_names$err)
+      logg_condition(w, loggr_object$parent_id, worker_id, iterator_variables, log_file_names$err)
       invokeRestart("muffleWarning")
     },
     message = function(m) {
-      loggr:::logg_condition(m, loggr_object$parent_id, worker_id, variables, log_file_names$err)
+      logg_condition(m, loggr_object$parent_id, worker_id, iterator_variables, log_file_names$err)
     }
   ), silent = TRUE)
 

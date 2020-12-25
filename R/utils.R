@@ -24,25 +24,30 @@ make_Rscript_call <- function(script, simu_log_folder_path) {
   )
 }
 
-paste_vars <- function(iterator_variables) {
-  paste0(
-    "#!vars;",
-    paste(
-      sprintf(
-        "%s=%s",
-        names(iterator_variables),
-        paste(iterator_variables)
-      ),
-      collapse = ","
-    )
+paste_vars <- function(variables, parent_id, worker_id = NULL, call_time = format(Sys.time(), "%y.%m.%d-%H.%M.%OS6")) {
+  logging_variables <- paste0(
+    "parentPID=", parent_id, ",",
+    ifelse(is.null(worker_id), "", paste0("workerPID=", worker_id, ",")),
+    "callTime=", call_time
   )
+
+  iteration_variables <- paste0(
+    sprintf(
+      "%s=%s",
+      names(variables),
+      paste(variables)
+    ),
+    collapse = ","
+  )
+
+  paste(logging_variables, iteration_variables, sep = ",")
 }
 
 logg_condition <- function(c, parent_id, worker_id, variables, log_file_name) {
   write(
     paste0(
-      loggr:::make_cat_prefix(class(c)[2], parent_id, worker_id), ";",
-      variables, "\n",
+      make_cat_prefix(class(c)[2]),
+      paste_vars(variables, parent_id, worker_id), "\n",
       "Call: ", paste(capture.output(c$call), collapse = "\n"), "\n",
       "Msg: ", c$message, "\n"
     ),
@@ -57,17 +62,27 @@ make_logg_file_names <- function(loggr_object) {
     function(file_ext) {
       file_name <- paste0("w-", loggr_object$call_time, "-", loggr_object$parent_id, "-", Sys.getpid(), "-", loggr_object$rscript_file_name, ".", file_ext)
 
-      file.path(
-        ifelse(isFALSE(loggr_object$log_folder_path), "", loggr_object$log_folder_path),
-        file_name
+      ifelse(
+        isFALSE(loggr_object$log_folder_path),
+        file_name,
+        file.path(
+          loggr_object$log_folder_path,
+          file_name
+        )
       )
     }
   )
 }
 
-make_cat_prefix <- function(name, parent_id, worker_id = NULL, call_time = format(Sys.time(), "%y.%m.%d-%H.%M.%OS6")) {
-  paste0(
-    "#!", name, ";", call_time, ";",
-    "parent_id=", parent_id, ifelse(is.null(worker_id), "", paste0(";", "worker_id=", worker_id))
-  )
+make_cat_prefix <- function(name) paste0("#!", name, ";")
+
+make_iterator_variable_names <- function(dots) {
+  if (is.null(names(dots))) {
+    dots
+  } else {
+    append(
+      as.list(names(dots)[names(dots) != ""]),
+      dots[names(dots) == ""]
+    )
+  }
 }

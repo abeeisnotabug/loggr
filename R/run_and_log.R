@@ -70,9 +70,13 @@ Overwrite the current directory?
   }
 
   ##### Execute Scripts and log in log_folder #####
-  sapply(
+  pids <- sapply(
     scripts,
-    loggr:::make_Rscript_call,
+    make_Rscript_call,
     simu_log_folder_path
   )
+
+  names(pids) <- scripts
+
+  pids
 }
