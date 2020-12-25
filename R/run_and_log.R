@@ -36,11 +36,17 @@ The ... must be paths to .R files relative to the current working directory.",
     }
   }
 
-  if (!file.exists(loggr::log_folder)) {
-    dir.create(loggr::log_folder)
+  if (is.null(getOption("loggr.log.folder.path"))) {
+    stop("Option loggr.log.folder.path not set (did you load the package?)")
+  } else {
+    log_folder <- getOption("loggr.log.folder.path")
   }
 
-  simu_log_folder_path <- file.path(loggr::log_folder, simu_name)
+  if (!file.exists(log_folder)) {
+    dir.create(log_folder)
+  }
+
+  simu_log_folder_path <- file.path(log_folder, simu_name)
 
   if (!file.exists(simu_log_folder_path)) {
     dir.create(simu_log_folder_path)
