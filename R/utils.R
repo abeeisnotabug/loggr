@@ -28,7 +28,7 @@ paste_vars <- function(variables, parent_id, worker_id = NULL, call_time = forma
   logging_variables <- paste0(
     "parentPID=", parent_id, ",",
     ifelse(is.null(worker_id), "", paste0("workerPID=", worker_id, ",")),
-    "callTime=", call_time
+    "callTime='", call_time, "'"
   )
 
   iteration_variables <- paste0(
