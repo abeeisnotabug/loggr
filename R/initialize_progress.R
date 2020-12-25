@@ -36,7 +36,7 @@ initialize_progress <- function(...) {
 
   cat(
     paste0(
-      make_cat_prefix("script"),
+      make_cat_prefix("script"), ";",
       paste(list(command_args)),";",
       paste_vars(iterator_variables, parent_id, worker_id = NULL, call_time)
     ),

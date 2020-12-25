@@ -20,7 +20,7 @@ log_progress <- function(..., loggr_object, expr) {
 
   to_write <- quote(
     paste0(
-      make_cat_prefix(timepoint),
+      make_cat_prefix(paste0("status='", timepoint, "'")), ",",
       paste_vars(iterator_variables, loggr_object$parent_id, worker_id)
     )
   )

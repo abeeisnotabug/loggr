@@ -46,7 +46,7 @@ paste_vars <- function(variables, parent_id, worker_id = NULL, call_time = forma
 logg_condition <- function(c, parent_id, worker_id, variables, log_file_name) {
   write(
     paste0(
-      make_cat_prefix(class(c)[2]),
+      make_cat_prefix(class(c)[2]), ";",
       paste_vars(variables, parent_id, worker_id), "\n",
       "Call: ", paste(capture.output(c$call), collapse = "\n"), "\n",
       "Msg: ", c$message, "\n"
@@ -74,7 +74,7 @@ make_logg_file_names <- function(loggr_object) {
   )
 }
 
-make_cat_prefix <- function(name) paste0("#!", name, ";")
+make_cat_prefix <- function(name) paste0("#!", name)
 
 make_iterator_variable_names <- function(dots) {
   if (is.null(names(dots))) {
