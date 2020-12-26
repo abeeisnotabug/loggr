@@ -24,11 +24,11 @@ make_Rscript_call <- function(script, simu_log_folder_path) {
   )
 }
 
-paste_vars <- function(variables, parent_id, worker_id = NULL, call_time = format(Sys.time(), "%y.%m.%d-%H.%M.%OS6")) {
+paste_vars <- function(variables, parent_id, worker_id = NULL, log_time = format(Sys.time(), "%y.%m.%d-%H.%M.%OS6")) {
   logging_variables <- paste0(
     "parentPID=", parent_id, ",",
     ifelse(is.null(worker_id), "", paste0("workerPID=", worker_id, ",")),
-    "callTime='", call_time, "'"
+    ifelse(is.null(log_time), "", paste0("logTime='", log_time, "',"))
   )
 
   iteration_variables <- paste0(
@@ -40,7 +40,7 @@ paste_vars <- function(variables, parent_id, worker_id = NULL, call_time = forma
     collapse = ","
   )
 
-  paste(logging_variables, iteration_variables, sep = ",")
+  paste0(logging_variables, iteration_variables)
 }
 
 logg_condition <- function(c, parent_id, worker_id, variables, log_file_name) {
