@@ -30,7 +30,8 @@ initialize_progress <- function(...) {
     "c-",
     call_time,
     "-", parent_id,
-    ifelse(rscript, paste0("-", rscript_file_name), ""),
+    "-NA-",
+    ifelse(rscript, rscript_file_name, "NA"),
     ".out"
   )
 

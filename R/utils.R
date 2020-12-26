@@ -1,11 +1,16 @@
+get_time <- function() {
+  format(Sys.time(), "%y.%m.%d.%H.%M.%OS6")
+}
+
 make_Rscript_call <- function(script, simu_log_folder_path) {
-  call_time <- format(Sys.time(), "%y.%m.%d-%H.%M.%OS6")
+  call_time <- get_time()
 
   out_and_err_file <- file.path(
     simu_log_folder_path,
     paste0(
       "s-",
       call_time, "-",
+      "NA-NA-",
       basename(script), ".",
       c("out", "err")
     )
@@ -24,7 +29,7 @@ make_Rscript_call <- function(script, simu_log_folder_path) {
   )
 }
 
-paste_vars <- function(variables, parent_id, worker_id = NULL, log_time = format(Sys.time(), "%y.%m.%d-%H.%M.%OS6")) {
+paste_vars <- function(variables, parent_id, worker_id = NULL, log_time = get_time()) {
   logging_variables <- paste0(
     "parentPID=", parent_id, ",",
     ifelse(is.null(worker_id), "", paste0("workerPID=", worker_id, ",")),

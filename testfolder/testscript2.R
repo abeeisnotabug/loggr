@@ -1,4 +1,4 @@
-loggr_object <- loggr::initialize_progress(prior = TRUE, type = c("u", "v"), i = 1:3, j = 1:10)
+loggr_object <- loggr::initialize_progress(prior = TRUE, type = c("u", "v"), i = 1:3, j = 1:4)
 
 library(doParallel)
 
@@ -7,12 +7,12 @@ registerDoParallel(cl)
 
 foreach(type = c("u", "v")) %:%
   foreach(i = 1:3) %:%
-  foreach(j = 1:10) %dopar% {
+  foreach(j = 1:4) %dopar% {
     loggr::log_progress(
       prior = TRUE, type, i, j,
       loggr_object = loggr_object,
       expr = {
-        Sys.sleep(runif(1))
+        Sys.sleep(runif(1, 2, 5))
         log(rnorm(1))
       }
     )
