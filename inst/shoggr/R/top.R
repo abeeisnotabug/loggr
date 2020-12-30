@@ -1,3 +1,5 @@
+library(stringr)
+
 top <- function() {
   top_out <- system("top -n 1 -b -c -w 512", intern = TRUE)
   

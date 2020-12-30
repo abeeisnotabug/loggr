@@ -1,60 +1,60 @@
 #' @export
 log_progress <- function(..., loggr_object, expr) {
   call_args <- as.list(match.call(expand.dots = FALSE))
-
-  iterators <- list(...)
-  iterator_values <- ifelse(
-    sapply(iterators, is.numeric) | sapply(iterators, is.logical),
-    sprintf("%s", iterators),
-    ifelse(
-      sapply(iterators, is.character),
-      sprintf("'%s'", iterators),
-      sprintf("'%s'", sapply(iterators, capture.output))
-    )
-  )
-
-  iterator_variables <- c(loggr_object$iterator$nextElem(), iterator_values)
-  names(iterator_variables) <- c("iterationCounter", make_iterator_variable_names(call_args$...))
+  raw_list <- call_args$...
+  raw_values <- list(...)
 
   worker_id <- Sys.getpid()
+  it_count <- loggr_object$iterator$currentElem()
 
-  to_write <- quote(
-    paste0(
-      make_cat_prefix(paste0("status='", timepoint, "'")), ",",
-      paste_vars(iterator_variables, loggr_object$parent_id, worker_id)
-    )
-  )
+  start_time <- get_time()
 
   log_file_names <- make_logg_file_names(loggr_object)
 
-  write(
-    with(list(timepoint = "start"), eval(to_write)),
-    file = log_file_names$out,
-    append = TRUE
-  )
+  count <- !loggr_object$count_explicitly
+
+  logg_this_condition <- function(c) {
+    logg_condition(
+      c = c,
+      log_line = with(list(status = class(c)[2]), eval(log_line)),
+      log_file_name = log_file_names$err
+    )
+  }
+
+  logg_iteration("start", start_time, loggr_object$parent_id, worker_id, it_count, raw_list, raw_values, log_file_names$out)
 
   result <- try(withCallingHandlers(
     eval(substitute(expr, env = globalenv())),
     error = function(e) {
-      logg_condition(e, loggr_object$parent_id, worker_id, iterator_variables, log_file_names$err)
+      logg_this_condition(e)
     },
     warning = function(w) {
-      logg_condition(w, loggr_object$parent_id, worker_id, iterator_variables, log_file_names$err)
+      logg_this_condition(w)
       invokeRestart("muffleWarning")
     },
     message = function(m) {
-      logg_condition(m, loggr_object$parent_id, worker_id, iterator_variables, log_file_names$err)
+      if (!grepl(prefix("count"), conditionMessage(m))) {
+        logg_this_condition(m)
+      } else {
+        count <<- conditionMessage(m) == prefix("count")
+      }
     }
   ), silent = TRUE)
 
-  write(
-    with(list(timepoint = "end"), eval(to_write)),
-    file = log_file_names$out
-  )
+  if (count) {
+    it_count <- loggr_object$iterator$nextElem()
+  }
+
+  logg_iteration("end", start_time, loggr_object$parent_id, worker_id, it_count, raw_list, raw_values, log_file_names$out)
 
   if (class(result) == "try-error") {
     stop(attr(result, "condition"))
   } else {
     result
   }
+}
+
+#'@export
+dontcount <- function() {
+  message(prefix("countNOT"), appendLF = FALSE)
 }

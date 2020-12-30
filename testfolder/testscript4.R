@@ -1,15 +1,15 @@
-loggr_object <- loggr::initialize_progress(prior = TRUE, type = c("y", "z"), i = 1:3, j = 1:4)
+loggr_object <- loggr::initialize_progress(gugu = c("ah", "oh"), k = 1:3, rep = 1:5)
 
 library(doParallel)
 
 cl <- makeCluster(2, outfile = loggr_object$outfile)
 registerDoParallel(cl)
 
-foreach(type = c("y", "z")) %:%
-  foreach(i = 1:3) %:%
-  foreach(j = 1:4) %dopar% {
+foreach(gugu = c("ah", "oh")) %:%
+  foreach(k = 1:3) %:%
+  foreach(rep = 1:5) %dopar% {
     loggr::log_progress(
-      prior = TRUE, type, i, j,
+      gugu, k, rep,
       loggr_object = loggr_object,
       expr = {
         Sys.sleep(runif(1, 2, 5))

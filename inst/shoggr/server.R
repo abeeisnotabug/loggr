@@ -1,7 +1,13 @@
 function(input, output, session) {
-  logFolderContents <- checkLogFolderContentServer("checkLogFolder")
-
-  # simuMonitorModuleServer("simuMonitorModule")
-  simuPickerModuleServer("sidebarSimuPicker", logFolderContents)
-  serverMonitorModuleServer("serverMonitorModule")
+  pickedSimu <- simuPickerServer("sidebarSimuPicker", session)
+  
+  observeEvent(pickedSimu(), {
+    simuMonitorServer("simuMonitor", pickedSimu())
+  })
+  
+  serverMonitorServer("serverMonitor")
+  
+  observeEvent(input$refreshPage, {
+    session$reload()
+  })
 }

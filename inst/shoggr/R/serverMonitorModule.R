@@ -1,23 +1,27 @@
-serverMonitorModuleUI <- function(id) {
+library(shinydashboard)
+library(DT)
+
+serverMonitorUI <- function(id) {
   ns <- NS(id)
   
   fluidPage(
     fluidRow(
-      shinydashboard::valueBoxOutput(ns("ramBox")),
-      shinydashboard::valueBoxOutput(ns("swapBox")),
-      shinydashboard::valueBoxOutput(ns("cpuBox"))
+      valueBoxOutput(ns("ramBox")),
+      valueBoxOutput(ns("swapBox")),
+      valueBoxOutput(ns("cpuBox"))
     ),
     fluidRow(
-      shinydashboard::box(
-        title = "Top Call",
+      box(
         width = 12,
+        title = "Top Call",
+        status = "danger",
         div(DT::dataTableOutput(ns("topTable")), style = "font-size:85%")
       )
     )
   )
 }
 
-serverMonitorModuleServer <- function(id) {
+serverMonitorServer <- function(id) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -28,15 +32,15 @@ serverMonitorModuleServer <- function(id) {
       #   top_reactive(top())
       # })
       
-      output$ramBox <- shinydashboard::renderValueBox({
+      output$ramBox <- renderValueBox({
         makeMemoryBox("RAM", total = top_reactive()$mem_df$mib[1], used = top_reactive()$mem_df$mib[3])
       })
       
-      output$swapBox <- shinydashboard::renderValueBox({
+      output$swapBox <- renderValueBox({
         makeMemoryBox("Swap", total = top_reactive()$mem_df$mib[5], used = top_reactive()$mem_df$mib[7])
       })
       
-      output$cpuBox <- shinydashboard::renderValueBox({
+      output$cpuBox <- renderValueBox({
         makeCPUBox(32, sum(top_reactive()$procs_df$`%CPU` > 90))
       })
       
@@ -44,6 +48,7 @@ serverMonitorModuleServer <- function(id) {
         DT::formatRound(
           DT::datatable(
             top_reactive()$procs_df,
+            class = "compact",
             options = list(
               columnDefs = list(
                 list(

@@ -1,5 +1,5 @@
 #' @export
-run_and_log <- function(simu_name, ..., append = FALSE) {
+run_and_log <- function(simu_name, ..., append = FALSE, count_explicitly = FALSE) {
   ##### Exception handling #####
   if (missing(simu_name)) {
     stop("A simulation name must be supplied.")
@@ -73,7 +73,8 @@ Overwrite the current directory?
   pids <- sapply(
     scripts,
     make_Rscript_call,
-    simu_log_folder_path
+    simu_log_folder_path,
+    count_explicitly
   )
 
   names(pids) <- scripts

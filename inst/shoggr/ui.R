@@ -1,33 +1,38 @@
-shinydashboard::dashboardPage(
+library(shinydashboard)
+library(shinyjs)
+
+dashboardPage(
   skin = "red",
 
-  shinydashboard::dashboardHeader(
+  dashboardHeader(
     title = "Simulation Monitor",
     titleWidth = 260
   ),
 
-  shinydashboard::dashboardSidebar(
+  dashboardSidebar(
     collapsed = FALSE,
     width = 260,
-    shinydashboard::sidebarMenu(
+    sidebarMenu(
       id = "tabs",
-      shinydashboard::menuItem(
+      menuItem(
         text = "Server Monitor",
-        tabName = "serverMonitor",
+        tabName = "serverMonitorTab",
         icon = icon("dashboard"),
         selected = TRUE
       ),
-      shinydashboard::menuItem(
+      menuItem(
         text = "Progress",
-        tabName = "simuMonitor",
+        tabName = "simuMonitorTab",
         icon = icon("database")
       ),
       hr(),
-      simuPickerModuleUI("sidebarSimuPicker")
+      simuPickerUI("sidebarSimuPicker"),
+      hr(),
+      makeRefreshButton("refreshPage", "Clear and reload", "redo")
     )
   ),
 
-  shinydashboard::dashboardBody(
+  dashboardBody(
     tags$head(
       tags$style(
         ".nav-tabs-custom .nav-tabs li.active { border-top-color: #d73925 }"
@@ -38,14 +43,13 @@ shinydashboard::dashboardPage(
          #inline .form-group { display: table-row }"
       )
     ),
-    shinyjs::useShinyjs(),
-    shinybusy::use_busy_bar(color = "#FFFFFF"),
-    shinydashboard::tabItems(
-      # shinydashboard::tabItem(
-      #   tabName = "simuMonitor", simuMonitorModuleUI("simuMonitorModule")
-      # ),
-      shinydashboard::tabItem(
-        tabName = "serverMonitor", serverMonitorModuleUI("serverMonitorModule")
+    useShinyjs(),
+    tabItems(
+      tabItem(
+        tabName = "simuMonitorTab", simuMonitorUI("simuMonitor")
+      ),
+      tabItem(
+        tabName = "serverMonitorTab", serverMonitorUI("serverMonitor")
       )
     )
   )

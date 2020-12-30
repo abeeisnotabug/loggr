@@ -31,3 +31,38 @@ makeCPUBox <- function(total, used) {
     )
   )
 }
+
+makeRefreshButton <- function(inputId, label, icon) {
+  fluidRow(
+    align = "center",
+    shinyWidgets::actionBttn(
+      inputId = inputId,
+      label = label,
+      style = "bordered",
+      icon = icon(icon),
+      block = FALSE,
+      size = "sm"
+    )
+  )
+}
+
+
+makeSelfNamedVector <- function(input) {
+  `names<-`(input, input)
+}
+
+eval_parse_text <- function(text) {
+  eval(parse(text = text))
+}
+
+
+countFinishedIters <- function(currents, totals) {
+  if (length(currents) > 1) {
+    finishedItersInLowerConditions <- (currents[1] - 1) * prod(totals[-1])
+    finishedItersInThisCondition <- countFinishedIters(currents[-1], totals[-1])
+    
+    sum(finishedItersInLowerConditions, finishedItersInThisCondition)
+  } else {
+    currents
+  }
+}
