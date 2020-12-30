@@ -127,7 +127,7 @@ logg_iteration <- function(status, start_time, parent_id, worker_id, it_count, r
   write(
     prefix(
       paste(
-        start, start_time,
+        status, start_time,
         parent_id, worker_id,
         it_count,
         paste_vars(raw_list, raw_values),
@@ -135,6 +135,6 @@ logg_iteration <- function(status, start_time, parent_id, worker_id, it_count, r
       )
     ),
     file = file,
-    append = status == "start"
+    append = (status == "start")
   )
 }

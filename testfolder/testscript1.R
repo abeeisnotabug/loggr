@@ -13,6 +13,9 @@ foreach(type = c("y", "z")) %:%
       loggr_object = loggr_object,
       expr = {
         Sys.sleep(runif(1, 2, 5))
+        if (i == 2) {
+          loggr::dontcount()
+        }
         log(rnorm(1))
       }
     )
