@@ -1,6 +1,7 @@
 library(kableExtra)
 library(DT)
-library(sortable)
+library(dplyr)
+library(tidyr)
 
 workerTablesByScriptUI <- function(id) {
   ns <- NS(id)
@@ -8,7 +9,7 @@ workerTablesByScriptUI <- function(id) {
   uiOutput(ns("workerBox"))
 }
 
-workerTablesByScriptServer <- function(id, thisScriptWorkerStati) {
+workerTablesByScriptServer <- function(id, thisScriptWorkerStati, thisScriptWorkerProcessStati) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -32,40 +33,47 @@ workerTablesByScriptServer <- function(id, thisScriptWorkerStati) {
           width = 7,
           title = paste("Workers to Parent PID", unique(scriptPID)),
           status = "danger",
-          # sortable_output(ns("orderSorter")),
           div(DT::dataTableOutput(ns("workerTable")), style = "font-size:85%")
         )
       })
       
-      # output$orderSorter <- render_sortable({
-      #   rank_list(labels = c("fu", "fa"), input_id = ns("orderSorterList"))
-      # })
-      
       output$workerTable <- DT::renderDataTable({
         rawTibble <- lapply(
-          reactiveValuesToList(thisScriptWorkerStati),
-          function(worker) {
+          names(reactiveValuesToList(thisScriptWorkerStati)),
+          function(workerName) {
             lapply(
-              worker,
+              thisScriptWorkerStati[[workerName]],
               function(startEnd) {
-                do.call(tibble, startEnd$loggrValues) %>% 
+                tibble(S = as.character(icons[[thisScriptWorkerProcessStati[[workerName]]]])) %>% 
+                  bind_cols(do.call(tibble, startEnd$loggrValues)) %>% 
                   bind_cols(do.call(tibble, startEnd$iteratorValues))
               }
             ) %>% bind_rows(.id = "status")
           }
         ) %>% bind_rows()
         
+        sortby <- ifelse("start" %in% rawTibble$status, "start", "end")
+        
+        workerPIDorder <- rawTibble %>% 
+          select(status, logTime, workerPID) %>% 
+          mutate(logTime = ymd_hms(logTime)) %>% 
+          pivot_wider(names_from = status, values_from = logTime) %>% 
+          arrange(desc(eval(parse(text = sortby)))) %>% .$workerPID
+        
         rawTibble %>%
           select(-parentPID) %>% 
           mutate(logTime = ymd_hms(logTime)) %>% 
           rename(iter = iterationCounter) %>% 
-          relocate(workerPID, .before = everything()) %>% 
-          arrange(desc(logTime), workerPID, desc(status)) %>%
+          relocate(c(workerPID, S), .before = everything()) %>% 
+          arrange(workerPID, desc(status)) %>%
+          arrange(match(workerPID, workerPIDorder)) %>% 
           group_by(workerPID) %>% 
-          mutate(workerPID = if (n() == 2) c(workerPID[1], NA) else workerPID) %>%
-          mutate(logTime = as.character(logTime)) %>% 
-          datatable(class = "compact", list(dom = "lpt", ordering = F), rownames = FALSE)# %>% 
-          # formatDate(3, "toLocaleString")
+          mutate(
+            workerPID = if (n() == 2) c(workerPID[1], NA) else workerPID,
+            S = if (n() == 2) c(S[1], NA) else S,
+            logTime = as.character(logTime)
+          ) %>%
+          datatable(class = "compact", list(dom = "t", ordering = F, pageLength = nrow(.)), rownames = FALSE, escape = -2)
       })
     }
   )

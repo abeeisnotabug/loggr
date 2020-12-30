@@ -1,4 +1,4 @@
-progBarsByScriptUI <- function(id, thisScriptOutInfos, thisScriptStarts, scriptTime) {
+progBarsByScriptUI <- function(id, thisScriptOutInfos, thisScriptStarts, scriptTime, thisScriptFinishedIters, thisScriptProcessStatus) {
   ns <- NS(id)
   
   scriptFileName <- unique(thisScriptOutInfos$files$scriptFileName)
@@ -8,9 +8,11 @@ progBarsByScriptUI <- function(id, thisScriptOutInfos, thisScriptStarts, scriptT
   progBarsToMake <- scriptVars[sapply(thisScriptOutInfos$iterators, length) > 1]
   iterCounts <- thisScriptOutInfos$iterCounts
   
+  thisIcon <- icons[[thisScriptProcessStatus]]
+  
   box(
     width = 5,
-    title = paste0(scriptFileName, " (", scriptTimeFmt, ")"),
+    title = span(thisIcon, paste0(scriptFileName, " (", scriptTimeFmt, ")")),
     status = "danger",
     lapply(
       progBarsToMake,
@@ -24,8 +26,8 @@ progBarsByScriptUI <- function(id, thisScriptOutInfos, thisScriptStarts, scriptT
           value = currentIter,
           total = iteratorTotal,
           display_pct = FALSE,
-          status = "primary",
-          striped = FALSE,
+          status = ifelse(thisScriptFinishedIters < thisScriptOutInfos$fullIterCount, "primary", "success"),
+          striped = thisScriptProcessStatus != "N",
           size = "xs"
         )
       }
@@ -33,7 +35,7 @@ progBarsByScriptUI <- function(id, thisScriptOutInfos, thisScriptStarts, scriptT
   )
 }
 
-progBarsByScriptServer <- function(id, thisScriptStarts, thisScriptOutInfos, scriptTime) {
+progBarsByScriptServer <- function(id, thisScriptStarts, thisScriptOutInfos, scriptTime, thisScriptFinishedIters, processStatus) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -52,7 +54,7 @@ progBarsByScriptServer <- function(id, thisScriptStarts, thisScriptOutInfos, scr
               id = paste0(scriptTime, ".", iteratorName),
               value = currentIter,
               total = iteratorTotal,
-              status = "primary"
+              status = ifelse(thisScriptFinishedIters < thisScriptOutInfos$fullIterCount, "primary", "success")
             )
           })
         }

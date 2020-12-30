@@ -25,29 +25,29 @@ serverMonitorServer <- function(id) {
   moduleServer(
     id,
     function(input, output, session) {
-      top_reactive <- reactiveVal(top())
+      topReactive <- reactiveVal(top())
       
       # observe({
       #   invalidateLater(10000, session)
-      #   top_reactive(top())
+      #   topReactive(top())
       # })
       
       output$ramBox <- renderValueBox({
-        makeMemoryBox("RAM", total = top_reactive()$mem_df$mib[1], used = top_reactive()$mem_df$mib[3])
+        makeMemoryBox("RAM", total = topReactive()$mem_df$mib[1], used = topReactive()$mem_df$mib[3])
       })
       
       output$swapBox <- renderValueBox({
-        makeMemoryBox("Swap", total = top_reactive()$mem_df$mib[5], used = top_reactive()$mem_df$mib[7])
+        makeMemoryBox("Swap", total = topReactive()$mem_df$mib[5], used = topReactive()$mem_df$mib[7])
       })
       
       output$cpuBox <- renderValueBox({
-        makeCPUBox(32, sum(top_reactive()$procs_df$`%CPU` > 90))
+        makeCPUBox(32, sum(topReactive()$procs_df$`%CPU` > 90))
       })
       
       output$topTable <- DT::renderDataTable(
         DT::formatRound(
           DT::datatable(
-            top_reactive()$procs_df,
+            topReactive()$procs_df,
             class = "compact",
             options = list(
               columnDefs = list(
@@ -67,6 +67,8 @@ serverMonitorServer <- function(id) {
           digits = 1
         )
       )
+      
+      return(reactive(topReactive()))
     }
   )
 }

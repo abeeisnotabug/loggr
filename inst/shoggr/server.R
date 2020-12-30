@@ -1,11 +1,10 @@
 function(input, output, session) {
   pickedSimu <- simuPickerServer("sidebarSimuPicker", session)
+  topout <- serverMonitorServer("serverMonitor")
   
   observeEvent(pickedSimu(), {
-    simuMonitorServer("simuMonitor", pickedSimu())
+    simuMonitorServer("simuMonitor", pickedSimu(), topout)
   })
-  
-  serverMonitorServer("serverMonitor")
   
   observeEvent(input$refreshPage, {
     session$reload()

@@ -7,7 +7,7 @@ mainProgressBarUI <- function(id) {
   uiOutput(ns("mainProgressBarBox"))
 }
 
-mainProgressBarServer <- function(id, scriptOutInfos, overallIters, currentEnds, finishedItersPerScript) {
+mainProgressBarServer <- function(id, scriptOutInfos, overallIters, currentEnds, finishedItersPerScript, processStati) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -19,6 +19,19 @@ mainProgressBarServer <- function(id, scriptOutInfos, overallIters, currentEnds,
         flog.info("mainProgBarUI")
         
         localFinishedItersSum <- isolate(do.call(sum, reactiveValuesToList(finishedItersPerScript)))
+        processStatiLocal <- isolate(
+          list(
+            scripts = reactiveValuesToList(processStati$scripts),
+            workers = lapply(processStati$workers, reactiveValuesToList)
+          )
+        )
+        allProcessStati <- unlist(processStatiLocal)
+        overallIcon <- if (all(allProcessStati != "N"))
+          icons$R
+        else if (any(allProcessStati != "N"))
+          icons$failure
+        else
+          icons$N
         
         fluidRow(
           box(
@@ -30,8 +43,8 @@ mainProgressBarServer <- function(id, scriptOutInfos, overallIters, currentEnds,
               total = overallIters,
               display_pct = TRUE,
               status = ifelse(localFinishedItersSum < overallIters, "primary", "success"),
-              striped = FALSE,
-              title = "Overall progress"
+              striped = all(allProcessStati != "N"),
+              title = span(overallIcon, "Overall progress")
             )
           )
         )

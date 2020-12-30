@@ -106,9 +106,9 @@ getOverallIters <- function(scriptOutInfos) {
   )
 }
 
-makeInitialWorkerStati <- function(script) {
+makeInitialWorkerStati <- function(script, initalState = list()) {
   workers <- script$files %>% filter(prefix == "w") %>% .$fileName
-  initialWorkerStati <- replicate(length(workers), list(), simplify = FALSE)
+  initialWorkerStati <- replicate(length(workers), initalState, simplify = FALSE)
   names(initialWorkerStati) <- workers
   initialWorkerStati
 }
