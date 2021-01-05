@@ -1,4 +1,4 @@
-makeWorkerStatusObservers <- function(workerOutMonitors, currentWorkerStati, finishedIters, scriptOutInfos) {
+makeWorkerStatusObservers <- function(workerOutMonitors, currentWorkerStati, scriptOutInfos) {
   lapply(
     names(workerOutMonitors),
     function(scriptTime) {
@@ -13,16 +13,7 @@ makeWorkerStatusObservers <- function(workerOutMonitors, currentWorkerStati, fin
             currentWorkerStatus <- getCurrentWorkerStatus(workerOutMonitor())
             currentWorkerStati[[scriptTime]][[workerOutName]] <- currentWorkerStatus
             
-            endCounters <- lapply(
-              reactiveValuesToList(currentWorkerStati[[scriptTime]]),
-              function(worker) {
-                worker$end$iterationCounter
-              }
-            )
-            
             flog.info(paste("workerStatusObserver", scriptTime))
-            
-            finishedIters[[scriptTime]] <- do.call(sum, endCounters)
           })
         }
       )

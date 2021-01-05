@@ -12,29 +12,49 @@ simuPickerUI <- function(id) {
       inputId = ns("simuPicker"),
       label = "Pick a Simulation",
       choices = dir(logFolderPath),
-      options = list(`live-search` = TRUE)
+      options = list(`live-search` = TRUE)#,
+      # choicesOpt = list(
+      #   style = rep(sprintf("color: %s", dropDownColor), length(dir(logFolderPath)))
+      # )
     ),
-    # makeRefreshButton(ns("refreshFolders"), "Refresh Simu Dir", "redo"),
-    makeRefreshButton(ns("pickButton"), "Pick", "paper-plane"),
+    makeButton(ns("pickButton"), "Pick", "paper-plane"),
     uiOutput(ns("pickedSimuDisplay"))
   )
 }
 
-simuPickerServer <- function(id, topLevelSession) {
+simuPickerServer <- function(id, topLevelSession, topout) {
   moduleServer(
     id,
     function(input, output, session) {
       pickedSimu <- reactiveVal(NULL)
+      dropDownColor <- "black"
       
-      observeEvent(input$refreshFolders, {
+      observeEvent(topout(), {
         pickedSimuBeforeRefresh <- input$simuPicker
         logFolderContents <- dir(logFolderPath)
+        
+        doesSimuRun <- lapply(
+          makeSelfNamedVector(logFolderContents),
+          function(simuFolder) {
+            getSimuRunStatus(file.path(logFolderPath, simuFolder), topout)
+          }
+        )
+        
+        simuIcons <- ifelse(
+          doesSimuRun,
+          rep("glyphicon-play", length(doesSimuRun)),
+          rep("glyphicon-stop", length(doesSimuRun))
+        )
         
         updatePickerInput(
           session = session,
           inputId = "simuPicker",
           choices = logFolderContents,
-          selected = if (pickedSimuBeforeRefresh %in% logFolderContents) pickedSimuBeforeRefresh else NULL
+          selected = if (pickedSimuBeforeRefresh %in% logFolderContents) pickedSimuBeforeRefresh else NULL,
+          choicesOpt = list(
+            icon = simuIcons,
+            style = rep(sprintf("color: %s", dropDownColor), length(logFolderContents))
+          )
         )
       })
       
@@ -47,16 +67,21 @@ simuPickerServer <- function(id, topLevelSession) {
           }
         )
         
+        pickedSimuPath <- file.path(logFolderPath, input$simuPicker)
+        
         output$pickedSimuDisplay <- renderUI({
+          doesSimuRun <- getSimuRunStatus(pickedSimuPath, topout)
+          simuRunStatus <- ifelse(doesSimuRun, "R", "N")
+            
           div(
             align = "center",
-            h5(paste("Monitoring Simu:", input$simuPicker))
+            h5(span("Monitoring Simu:", icons[[simuRunStatus]], input$simuPicker))
           )
         })
         
         updateTabItems(topLevelSession, "tabs", "simuMonitorTab")
         
-        pickedSimu(file.path(logFolderPath, input$simuPicker))
+        pickedSimu(pickedSimuPath)
       })
       
       return(

@@ -1,6 +1,7 @@
 function(input, output, session) {
-  pickedSimu <- simuPickerServer("sidebarSimuPicker", session)
-  topout <- serverMonitorServer("serverMonitor")
+  settingsInput <- settingsMenuServer("settingsMenu")
+  topout <- serverMonitorServer("serverMonitor", settingsInput)
+  pickedSimu <- simuPickerServer("sidebarSimuPicker", session, topout)
   
   observeEvent(pickedSimu(), {
     simuMonitorServer("simuMonitor", pickedSimu(), topout)

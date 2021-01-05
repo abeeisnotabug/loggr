@@ -1,16 +1,21 @@
-makeFinishedItersPerScriptObserver <- function(finishedItersPerScript, scriptOutInfos, currentEnds) {
-  observe({
+makeFinishedItersPerScriptObserver <- function(finishedItersPerScript, scriptOutInfos, currentEnds, currentStarts) {
     lapply(
       names(scriptOutInfos),
       function(scriptTime) {
-        totalsVec <- unlist(scriptOutInfos[[scriptTime]]$iterCounts)
-        currentsVec <- unlist(reactiveValuesToList(currentEnds[[scriptTime]]))[names(totalsVec)]
-        
-        flog.info(paste("mainProgBar", scriptTime))
-        flog.debug(str(list(totalsVec, currentsVec)))
-        
-        finishedItersPerScript[[scriptTime]] <- countFinishedIters(currentsVec, totalsVec)
+        observe({
+          currentEndVec <- unlist(reactiveValuesToList(currentEnds[[scriptTime]]))
+          
+          totalsVec <- unlist(scriptOutInfos[[scriptTime]]$iterCounts)
+          currentsVec <- if (0 %in% currentEndVec) {
+            unlist(isolate(reactiveValuesToList(currentStarts[[scriptTime]])))[names(totalsVec)]
+          } else {
+            currentEndVec[names(totalsVec)]
+          }
+  
+          flog.info(paste("finishedItersPerScript", scriptTime))
+          
+          finishedItersPerScript[[scriptTime]] <- countFinishedIters(currentsVec, totalsVec)
+        })
       }
     )
-  })
 }

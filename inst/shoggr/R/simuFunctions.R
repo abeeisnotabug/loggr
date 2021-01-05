@@ -33,7 +33,7 @@ getSimuFiles <- function(simuPath, extension) {
 getInfo <- function(simuPath) {
   simuFiles <- getSimuFiles(simuPath, "out")
 
-  lapply(
+  info <- lapply(
     simuFiles,
     function(scriptFiles) {
       outLines <- readLines(
@@ -69,40 +69,55 @@ getInfo <- function(simuPath) {
       )
     }
   )
+  
+  info[sort(names(info), decreasing = TRUE)]
 }
 
-makeMonitors <- function(session, scriptInfos, simuPath, monitorPrefix = "w") {
+makeMonitors <- function(session, scriptOutInfos, simuPath, topout, monitorPrefix = "w") {
   lapply(
-    scriptInfos,
+    scriptOutInfos,
     function(script) {
-      toMonitor <- makeSelfNamedVector(
-        script$files %>%
-          filter(prefix == monitorPrefix) %>%
-          .$fileName
-      )
+      workerInfo <- script$files %>%
+        filter(prefix == monitorPrefix) %>%
+        select(fileName, workerPID)
 
       lapply(
-        toMonitor,
-        function(file) {
-          reactiveFileReader(
-            1000,
-            session,
-            file.path(simuPath, file),
-            readLines
-          )
+        makeSelfNamedVector(workerInfo$fileName),
+        function(workerFileName) {
+          workerFilePath <- file.path(simuPath, workerFileName)
+          workerPID <- workerInfo %>% filter(fileName == workerFileName) %>% .$workerPID
+          flog.debug(paste(workerFileName, workerPID %in% topout$procs_df$PID))
+          if (workerPID %in% topout$procs_df$PID) {
+            reactiveFileReader(
+              1000,
+              session,
+              workerFilePath,
+              readLines
+            )
+          } else {
+            function() readLines(workerFilePath)
+          }
         }
       )
     }
   )
 }
 
-getOverallIters <- function(scriptOutInfos) {
-  sum(
-    sapply(
-      scriptOutInfos,
-      `[[`,
-      "fullIterCount"
-    )
+getCombinedIterators <- function(scriptOutInfos) {
+  allIterators <- lapply(
+    scriptOutInfos,
+    `[[`,
+    "iterators"
+  )
+  
+  names(allIterators) <- NULL
+  cList <- do.call(c, allIterators)
+  
+  lapply(
+    makeSelfNamedVector(unique(names(cList))),
+    function(iteratorName) {
+      unlist(unique(cList[which(names(cList) == iteratorName)]))
+    }
   )
 }
 
@@ -121,4 +136,13 @@ makeInitialIterCounters <- function(script) {
   )
   names(initialIters) <- names(script$iterators)
   initialIters
+}
+
+getSimuRunStatus <- function(path, topout) {
+  dir(path) %>% 
+    str_subset("^(c-).*(.out)$") %>%
+    str_split_fixed("-", 5) %>%
+    .[,3] %>% 
+    `%in%`(topout()$procs_df$PID) %>% 
+    any
 }

@@ -6,7 +6,8 @@ dashboardPage(
 
   dashboardHeader(
     title = "Simulation Monitor",
-    titleWidth = 260
+    titleWidth = 260,
+    settingsMenuUI("settingsMenu")
   ),
 
   dashboardSidebar(
@@ -28,7 +29,7 @@ dashboardPage(
       hr(),
       simuPickerUI("sidebarSimuPicker"),
       hr(),
-      makeRefreshButton("refreshPage", "Clear and reload", "redo")
+      makeButton("refreshPage", "Clear and reload", "redo")
     )
   ),
 
@@ -41,7 +42,10 @@ dashboardPage(
         type = "text/css",
         "#inline label{ display: table-cell; text-align: center; vertical-align: middle; color: white }
          #inline .form-group { display: table-row }"
-      )
+      ),
+      tags$style(HTML(".small-box {height: 80px}")),
+      tags$style(HTML("h3 { margin-top : 0 }")),
+      tags$style(HTML("h4 { margin-top : 0 }"))
     ),
     useShinyjs(),
     tabItems(

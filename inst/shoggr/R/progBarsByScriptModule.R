@@ -1,37 +1,29 @@
-progBarsByScriptUI <- function(id, thisScriptOutInfos, thisScriptStarts, scriptTime, thisScriptFinishedIters, thisScriptProcessStatus) {
+progBarsByScriptUI <- function(id, thisScriptOutInfos, thisScriptStarts, thisScriptFinishedIters, scriptProcessStati, scriptTime) {
   ns <- NS(id)
-  
-  scriptFileName <- unique(thisScriptOutInfos$files$scriptFileName)
-  scriptTimeFmt <- ymd_hms(scriptTime)
-  
+
   scriptVars <- names(thisScriptOutInfos$iterators)
   progBarsToMake <- scriptVars[sapply(thisScriptOutInfos$iterators, length) > 1]
   iterCounts <- thisScriptOutInfos$iterCounts
-  
-  thisIcon <- icons[[thisScriptProcessStatus]]
-  
-  box(
-    width = 5,
-    title = span(thisIcon, paste0(scriptFileName, " (", scriptTimeFmt, ")")),
-    status = "danger",
-    lapply(
-      progBarsToMake,
-      function(iteratorName) {
-        currentIter <- isolate(thisScriptStarts[[iteratorName]])
-        iteratorTotal <- iterCounts[[iteratorName]]
-        
-        progressBar(
-          id = ns(paste0(scriptTime, ".", iteratorName)),
-          title = iteratorName,
-          value = currentIter,
-          total = iteratorTotal,
-          display_pct = FALSE,
-          status = ifelse(thisScriptFinishedIters < thisScriptOutInfos$fullIterCount, "primary", "success"),
-          striped = thisScriptProcessStatus != "N",
-          size = "xs"
-        )
-      }
-    )
+  scriptProcessStatusBool <- scriptProcessStati[[scriptTime]] != "N"
+
+  lapply(
+    progBarsToMake,
+    function(iteratorName) {
+      currentIter <- isolate(thisScriptStarts[[iteratorName]])
+      iteratorTotal <- iterCounts[[iteratorName]]
+      flog.info(paste("progBar", scriptTime, iteratorName, "scriptProcessStatus", scriptProcessStatusBool))
+      
+      progressBar(
+        id = ns(paste0(scriptTime, ".", iteratorName)),
+        title = iteratorName,
+        value = currentIter,
+        total = iteratorTotal,
+        display_pct = FALSE,
+        status = ifelse(thisScriptFinishedIters < thisScriptOutInfos$fullIterCount, "primary", "success"),
+        striped = scriptProcessStatusBool,
+        size = "xs"
+      )
+    }
   )
 }
 
@@ -46,7 +38,7 @@ progBarsByScriptServer <- function(id, thisScriptStarts, thisScriptOutInfos, scr
             currentIter <- thisScriptStarts[[iteratorName]]
             iteratorTotal <- thisScriptOutInfos$iterCounts[[iteratorName]]
             
-            flog.info(paste("probBoxByScript", paste0(scriptTime, "-", iteratorName)))
+            flog.info(paste("probBarsByScript", paste0(scriptTime, "-", iteratorName)))
             flog.debug(paste(currentIter, iteratorTotal))
             
             updateProgressBar(

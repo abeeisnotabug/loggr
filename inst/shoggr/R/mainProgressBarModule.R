@@ -7,25 +7,38 @@ mainProgressBarUI <- function(id) {
   uiOutput(ns("mainProgressBarBox"))
 }
 
-mainProgressBarServer <- function(id, scriptOutInfos, overallIters, currentEnds, finishedItersPerScript, processStati) {
+mainProgressBarServer <- function(id, scriptOutInfos, combinedIterators, currentEnds, finishedItersPerScript, processStati) {
   moduleServer(
     id,
     function(input, output, session) {
       ns <- session$ns
+      
+      overallIters <- prod(sapply(combinedIterators, length))
       
       output$mainProgressBarBox <- renderUI({
         req(reactiveValuesToList(finishedItersPerScript))
         
         flog.info("mainProgBarUI")
         
-        localFinishedItersSum <- isolate(do.call(sum, reactiveValuesToList(finishedItersPerScript)))
-        processStatiLocal <- isolate(
-          list(
-            scripts = reactiveValuesToList(processStati$scripts),
-            workers = lapply(processStati$workers, reactiveValuesToList)
+        nonDuplicatedScripts <- names(scriptOutInfos)[
+          !duplicated(
+            lapply(
+              scriptOutInfos,
+              `[[`,
+              "iterators"
+            )
           )
+        ]
+        
+        localFinishedItersPerScript <- isolate(reactiveValuesToList(finishedItersPerScript))
+
+        finishedItersSum <- isolate(do.call(sum, localFinishedItersPerScript[nonDuplicatedScripts]))
+        
+        processStatiList <- list(
+          scripts = reactiveValuesToList(processStati$scripts),
+          workers = lapply(processStati$workers, reactiveValuesToList)
         )
-        allProcessStati <- unlist(processStatiLocal)
+        allProcessStati <- unlist(processStatiList)
         overallIcon <- if (all(allProcessStati != "N"))
           icons$R
         else if (any(allProcessStati != "N"))
@@ -39,10 +52,10 @@ mainProgressBarServer <- function(id, scriptOutInfos, overallIters, currentEnds,
             status = "danger",
             progressBar(
               id = ns("mainProgBar"),
-              value = localFinishedItersSum,
+              value = finishedItersSum,
               total = overallIters,
               display_pct = TRUE,
-              status = ifelse(localFinishedItersSum < overallIters, "primary", "success"),
+              status = ifelse(finishedItersSum < overallIters, "primary", "success"),
               striped = all(allProcessStati != "N"),
               title = span(overallIcon, "Overall progress")
             )
@@ -51,7 +64,19 @@ mainProgressBarServer <- function(id, scriptOutInfos, overallIters, currentEnds,
       })
       
       observe({
-        finishedItersSum <- do.call(sum, reactiveValuesToList(finishedItersPerScript))
+        nonDuplicatedScripts <- names(scriptOutInfos)[
+          !duplicated(
+            lapply(
+              scriptOutInfos,
+              `[[`,
+              "iterators"
+            )
+          )
+        ]
+        
+        localFinishedItersPerScript <- isolate(reactiveValuesToList(finishedItersPerScript))
+        
+        finishedItersSum <- isolate(do.call(sum, localFinishedItersPerScript[nonDuplicatedScripts]))
         
         flog.info("mainProgBarSERVER")
         

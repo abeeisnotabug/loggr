@@ -6,12 +6,12 @@ top <- function() {
   top_head <- top_out[1:5]
   top_procs <- top_out[7:length(top_out)]
   
-  procs_mat <- str_split_fixed(top_procs[2:length(top_procs)], "[ ]+", 13)
-  colnames(procs_mat) <- str_split_fixed(top_procs[1], "[ ]+", 13)
+  procs_mat <- str_split_fixed(str_trim(top_procs[2:length(top_procs)]), "[ ]+", 12)
+  colnames(procs_mat) <- str_split_fixed(str_trim(top_procs[1]), "[ ]+", 12)
   procs_df <- as.data.frame(procs_mat)
-  procs_df[2:12] <- lapply(procs_df[2:12], str_replace_all, ",", ".")
-  procs_df[2:13] <- lapply(procs_df[2:13], type.convert, as.is = TRUE)
-  procs_df <- procs_df[-1]
+  procs_df[1:11] <- lapply(procs_df[1:11], str_replace_all, ",", ".")
+  procs_df[1:11] <- lapply(procs_df[1:11], type.convert, as.is = TRUE)
+  
   procs_df[, c("VIRT", "RES", "SHR")] <- procs_df[, c("VIRT", "RES", "SHR")] / 1024
   names(procs_df)[5:7] <- paste(names(procs_df)[5:7], "(MiB)")
   

@@ -1,7 +1,7 @@
 library(dplyr)
 require(futile.logger)
 
-flog.threshold(WARN)
+flog.threshold(INFO)
 
 simuMonitorUI <- function(id) {
   ns <- NS(id)
@@ -29,7 +29,7 @@ simuMonitorServer <- function(id, pickedSimu, topout) {
             mainProgressBarUI(ns("mainProgBar"))
           ),
           fluidRow(
-            progressBoxesByScriptUI(ns("progBoxesByScript"))
+            scriptBoxesUI(ns("progBoxesByScript"))
           )
         )
       })
@@ -40,16 +40,16 @@ simuMonitorServer <- function(id, pickedSimu, topout) {
       currentStarts <- list()
       currentEnds <- list()
       currentWorkerStati <- list()
-      finishedIters <- reactiveValues()
+      scriptSpeeds <- reactiveValues()
       finishedItersPerScript <- reactiveValues()
       processStati <- list(
         scripts = reactiveValues(),
         workers = list()
       )
       
-      flog.info("Change")
+      flog.info("simuMonitorModuleSERVER")
       
-      localOverallIters <- getOverallIters(scriptOutInfos)
+      combinedIterators <- getCombinedIterators(scriptOutInfos)
       
       lapply(
         scriptOutInfos,
@@ -61,17 +61,18 @@ simuMonitorServer <- function(id, pickedSimu, topout) {
           currentEnds[[scriptTime]] <<- do.call(reactiveValues, makeInitialIterCounters(script))
           processStati$scripts[[scriptTime]] <- "N"
           processStati$workers[[scriptTime]] <<- do.call(reactiveValues, makeInitialWorkerStati(script, "N"))
-          finishedIters[[scriptTime]] <- 0
+          scriptSpeeds[[scriptTime]] <- list(overall = NA, current = NA)
         }
       )
       
-      workerOutMonitors <- makeMonitors(session, scriptOutInfos, pickedSimu, monitorPrefix = "w")
-      makeWorkerStatusObservers(workerOutMonitors, currentWorkerStati, finishedIters, scriptOutInfos)
+      workerOutMonitors <- makeMonitors(session, scriptOutInfos, pickedSimu, isolate(topout()), monitorPrefix = "w")
+      makeWorkerStatusObservers(workerOutMonitors, currentWorkerStati, scriptOutInfos)
       makeProcessStatusObservers(scriptOutInfos, processStati, topout)
+      makeSpeedObservers(currentWorkerStati, scriptSpeeds, scriptOutInfos, finishedItersPerScript)
       makeCurrentIterUpdateObservers(currentWorkerStati, currentStarts, currentEnds, scriptOutInfos)
-      makeFinishedItersPerScriptObserver(finishedItersPerScript, scriptOutInfos, currentEnds)
-      mainProgressBarServer("mainProgBar", scriptOutInfos, localOverallIters, currentEnds, finishedItersPerScript, processStati)
-      progressBoxesByScriptServer("progBoxesByScript", scriptOutInfos, currentStarts, currentWorkerStati, finishedItersPerScript, processStati)
+      makeFinishedItersPerScriptObserver(finishedItersPerScript, scriptOutInfos, currentEnds, currentStarts)
+      mainProgressBarServer("mainProgBar", scriptOutInfos, combinedIterators, currentEnds, finishedItersPerScript, processStati)
+      scriptBoxesServer("progBoxesByScript", scriptOutInfos, currentStarts, currentWorkerStati, finishedItersPerScript, processStati, scriptSpeeds, pickedSimu)
     }
   )
 }

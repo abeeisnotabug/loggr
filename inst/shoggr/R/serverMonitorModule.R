@@ -21,7 +21,7 @@ serverMonitorUI <- function(id) {
   )
 }
 
-serverMonitorServer <- function(id) {
+serverMonitorServer <- function(id, settingsInput) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -31,6 +31,9 @@ serverMonitorServer <- function(id) {
       #   invalidateLater(10000, session)
       #   topReactive(top())
       # })
+      observeEvent(settingsInput$refreshTop, {
+        topReactive(top())
+      })
       
       output$ramBox <- renderValueBox({
         makeMemoryBox("RAM", total = topReactive()$mem_df$mib[1], used = topReactive()$mem_df$mib[3])

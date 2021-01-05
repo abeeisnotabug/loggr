@@ -7,6 +7,8 @@ makeProcessStatusObservers <- function(scriptOutInfos, processStati, topout) {
           thisS <- topout()$procs_df$S[which(topout()$procs_df$PID == script$parentPID)]
           
           processStati$scripts[[script$callTime]] <- ifelse(length(thisS), thisS, "N")
+          
+          flog.info(paste("processStatusObserver", script$callTime))
         })
         
         lapply(
@@ -18,6 +20,8 @@ makeProcessStatusObservers <- function(scriptOutInfos, processStati, topout) {
               thisS <- topout()$procs_df$S[which(topout()$procs_df$PID == thisWorkerPID)]
               
               processStati$workers[[script$callTime]][[worker]] <- ifelse(length(thisS), thisS, "N")
+              
+              flog.info(paste("processStatusObserver", worker))
             })
           }
         )

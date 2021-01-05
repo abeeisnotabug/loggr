@@ -17,7 +17,7 @@ workerTablesByScriptServer <- function(id, thisScriptWorkerStati, thisScriptWork
       
       output$workerBox <- renderUI({
         scriptPID <- sapply(
-          reactiveValuesToList(thisScriptWorkerStati),
+          isolate(reactiveValuesToList(thisScriptWorkerStati)),
           function(worker) {
             unique(
               sapply(
@@ -29,12 +29,14 @@ workerTablesByScriptServer <- function(id, thisScriptWorkerStati, thisScriptWork
           }
         )
         
-        box(
-          width = 7,
-          title = paste("Workers to Parent PID", unique(scriptPID)),
-          status = "danger",
+        nWorkers <- length(isolate(reactiveValuesToList(thisScriptWorkerStati)))
+        
+        # box(
+        #   width = 7,
+        #   title = paste(nWorkers, "workers to parent PID", unique(scriptPID)),
+        #   status = "danger",
           div(DT::dataTableOutput(ns("workerTable")), style = "font-size:85%")
-        )
+        # )
       })
       
       output$workerTable <- DT::renderDataTable({
@@ -60,20 +62,24 @@ workerTablesByScriptServer <- function(id, thisScriptWorkerStati, thisScriptWork
           pivot_wider(names_from = status, values_from = logTime) %>% 
           arrange(desc(eval(parse(text = sortby)))) %>% .$workerPID
         
+        dom <- ifelse(nrow(rawTibble) <= 10, "t", "lpt")
+        pageLen <- ifelse(nrow(rawTibble) <= 12, nrow(rawTibble), 12)
+        
         rawTibble %>%
           select(-parentPID) %>% 
+          rename(PID = workerPID) %>% 
           mutate(logTime = ymd_hms(logTime)) %>% 
           rename(iter = iterationCounter) %>% 
-          relocate(c(workerPID, S), .before = everything()) %>% 
-          arrange(workerPID, desc(status)) %>%
-          arrange(match(workerPID, workerPIDorder)) %>% 
-          group_by(workerPID) %>% 
+          relocate(c(PID, S), .before = everything()) %>% 
+          arrange(PID, desc(status)) %>%
+          arrange(match(PID, workerPIDorder)) %>% 
+          group_by(PID) %>% 
           mutate(
-            workerPID = if (n() == 2) c(workerPID[1], NA) else workerPID,
+            PID = if (n() == 2) c(PID[1], NA) else PID,
             S = if (n() == 2) c(S[1], NA) else S,
             logTime = as.character(logTime)
           ) %>%
-          datatable(class = "compact", list(dom = "t", ordering = F, pageLength = nrow(.)), rownames = FALSE, escape = -2)
+          datatable(class = "compact", list(dom = dom, ordering = F, pageLength = pageLen), rownames = FALSE, escape = -2)
       })
     }
   )

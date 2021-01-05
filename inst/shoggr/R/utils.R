@@ -1,7 +1,7 @@
 makeMemoryBox <- function(type, total, used) {
-  shinydashboard::valueBox(
-    sprintf("%.1f / %.1f GiB", (total - used) / 1024, total / 1024),
-    paste0(type, " available"),
+  makeResizedValueBox(
+    value = sprintf("%.1f / %.1f GiB", (total - used) / 1024, total / 1024),
+    subtitle = paste0(type, " available"),
     icon = icon("memory"),
     color = ifelse(
       used / total < 0.75,
@@ -16,9 +16,9 @@ makeMemoryBox <- function(type, total, used) {
 }
 
 makeCPUBox <- function(total, used) {
-  shinydashboard::valueBox(
-    sprintf("%s / %s", used, total),
-    "cores in use",
+  makeResizedValueBox(
+    value = sprintf("%s / %s", used, total),
+    subtitle = "cores in use",
     icon = icon("microchip"),
     color = ifelse(
       used < total,
@@ -32,7 +32,20 @@ makeCPUBox <- function(total, used) {
   )
 }
 
-makeRefreshButton <- function(inputId, label, icon) {
+makeResizedValueBox <- function(value, subtitle, icon, color, href = NULL) {
+  valueBox(
+    value = tags$p(
+      style = "font-size: 80%;",
+      value
+    ),
+    subtitle = subtitle,
+    icon = tags$i(class = icon$attribs$class, style = "font-size: 50px"),
+    color = color,
+    href = href
+  )
+}
+
+makeButton <- function(inputId, label, icon) {
   fluidRow(
     align = "center",
     shinyWidgets::actionBttn(
@@ -45,7 +58,6 @@ makeRefreshButton <- function(inputId, label, icon) {
     )
   )
 }
-
 
 makeSelfNamedVector <- function(input) {
   `names<-`(input, input)
@@ -65,4 +77,13 @@ countFinishedIters <- function(currents, totals) {
   } else {
     currents
   }
+}
+
+getDigitsToRound <- function(secondsToRound) {
+  ifelse(secondsToRound < 1, 3, ifelse(secondsToRound < 10, 2, ifelse(secondsToRound < 100, 1, 0)))
+}
+
+roundSecondsToPeriod <- function(secondsToRound, addUnit = NULL) {
+  toPaste <- round(seconds_to_period(secondsToRound), getDigitsToRound(secondsToRound))
+  paste0(toPaste, if (is.na(toPaste)) NULL else addUnit)
 }
