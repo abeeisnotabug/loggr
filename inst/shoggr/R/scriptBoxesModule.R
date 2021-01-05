@@ -21,8 +21,6 @@ scriptBoxesServer <- function(id, scriptOutInfos, currentStarts, currentWorkerSt
                 width = 12,
                 status = "danger",
                 scriptBoxHeaderUI(ns(paste0(scriptTime, ".scriptBoxHeader"))),
-                # scriptStatsUI(ns(paste0(scriptTime, ".valueBoxes"))),
-                # br(),
                 column(
                   width = 5,
                   h5(tags$b("Script Stats:")),
