@@ -14,11 +14,7 @@ log_progress <- function(..., loggr_object, expr) {
   count <- !loggr_object$count_explicitly
 
   logg_this_condition <- function(c) {
-    logg_condition(
-      c = c,
-      log_line = with(list(status = class(c)[2]), eval(log_line)),
-      log_file_name = log_file_names$err
-    )
+    logg_condition(c = c, start_time, loggr_object$parent_id, worker_id, it_count, raw_list, raw_values, log_file_names$err)
   }
 
   logg_iteration("start", start_time, loggr_object$parent_id, worker_id, it_count, raw_list, raw_values, log_file_names$out)

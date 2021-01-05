@@ -96,10 +96,10 @@ paste_vars <- function(raw_list, raw_values) {
   )
 }
 
-logg_condition <- function(c, log_line, log_file_name) {
+logg_condition <- function(c, start_time, parent_id, worker_id, it_count, raw_list, raw_values, log_file_name) {
   write(
     paste0(
-      log_line, "\n",
+      make_logg_line(class(c)[2], start_time, parent_id, worker_id, it_count, raw_list, raw_values), "\n",
       "Call: ", paste(capture.output(conditionCall(c)), collapse = "\n"), "\n",
       "Msg: ", conditionMessage(c), "\n"
     ),
@@ -125,16 +125,20 @@ cat_initialize_progress <- function(command_args, call_time, parent_id, raw_list
 
 logg_iteration <- function(status, start_time, parent_id, worker_id, it_count, raw_list, raw_values, file) {
   write(
-    prefix(
-      paste(
-        status, start_time,
-        parent_id, worker_id,
-        it_count,
-        paste_vars(raw_list, raw_values),
-        sep = ";"
-      )
-    ),
+    make_logg_line(status, start_time, parent_id, worker_id, it_count, raw_list, raw_values),
     file = file,
     append = (status == "start")
+  )
+}
+
+make_logg_line <- function(status, start_time, parent_id, worker_id, it_count, raw_list, raw_values) {
+  prefix(
+    paste(
+      status, start_time,
+      parent_id, worker_id,
+      it_count,
+      paste_vars(raw_list, raw_values),
+      sep = ";"
+    )
   )
 }
