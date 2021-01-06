@@ -4,7 +4,7 @@ scriptBoxHeaderUI <- function(id) {
   uiOutput(ns("scriptBoxHeader"))
 }
 
-scriptBoxHeaderServer <- function(id, thisScriptOutInfos, scriptProcessStati, scriptTime, pickedSimu) {
+scriptBoxHeaderServer <- function(id, thisScriptOutInfos, scriptProcessStati, scriptTime, pickedSimu, errFiles) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -23,11 +23,14 @@ scriptBoxHeaderServer <- function(id, thisScriptOutInfos, scriptProcessStati, sc
               span(sprintf("%s (%s) ", scriptFileName, scriptTimeFmt), style = paste("color:", "grey"))
             ),
             div(
-              style = "float: left",
-              splitLayout(
-                cellWidths = c("50%", "50%"),
-                killCleanupUI(ns("killCleanupButton")),
+              style = "float: right",
+              div(
+                style = "display: inline-block",
                 downloadWarningsUI(ns("downloadWarningsButton"))
+              ),
+              div(
+                style = "display: inline-block",
+                killCleanupUI(ns("killCleanupButton"))
               )
             )
           )
@@ -35,7 +38,7 @@ scriptBoxHeaderServer <- function(id, thisScriptOutInfos, scriptProcessStati, sc
       })
       
       killCleanupServer("killCleanupButton", thisScriptWorkerStati, pickedSimu, scriptProcessStati, scriptTime)
-      downloadWarningsServer("downloadWarningsButton")
+      downloadWarningsServer("downloadWarningsButton", pickedSimu, errFiles, scriptTime, thisScriptOutInfos)
     }
   )
 }

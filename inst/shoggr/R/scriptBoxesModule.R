@@ -4,7 +4,7 @@ scriptBoxesUI <- function(id) {
   uiOutput(ns("progBoxesByScript"))
 }
 
-scriptBoxesServer <- function(id, scriptOutInfos, currentStarts, currentWorkerStati, finishedItersPerScript, processStati, scriptSpeeds, pickedSimu) {
+scriptBoxesServer <- function(id, scriptOutInfos, currentStarts, currentWorkerStati, finishedItersPerScript, processStati, scriptSpeeds, pickedSimu, errFiles) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -55,7 +55,8 @@ scriptBoxesServer <- function(id, scriptOutInfos, currentStarts, currentWorkerSt
             scriptOutInfos[[scriptTime]],
             processStati$script,
             scriptTime,
-            pickedSimu
+            pickedSimu,
+            errFiles
           )
           scriptStatsServer(
             paste0(scriptTime, ".scriptStats"),

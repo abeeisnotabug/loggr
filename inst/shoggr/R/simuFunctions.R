@@ -16,9 +16,10 @@ getSimuFiles <- function(simuPath, extension) {
     function(script) {
       filesOfThisScript <- str_detect(fileMatrix[, 2], script)
 
-      fileMatrix[filesOfThisScript, ] %>%
+      fileMatrix %>% 
         `colnames<-`(c("prefix", "callTime", "parentPID", "workerPID", "scriptFileName")) %>%
         as_tibble %>%
+        filter(filesOfThisScript) %>%
         mutate(
           callTime = ymd_hms(callTime),
           parentPID = suppressWarnings(as.integer(parentPID)),
@@ -145,4 +146,15 @@ getSimuRunStatus <- function(path, topout) {
     .[,3] %>% 
     `%in%`(topout()$procs_df$PID) %>% 
     any
+}
+
+getErrFiles <- function(simuPath, errFilesRV) {
+  errFilesByScript <- getSimuFiles(simuPath, "err")
+  
+  lapply(
+    names(errFilesByScript),
+    function(scriptTime) {
+      errFilesRV[[scriptTime]] <- errFilesByScript[[scriptTime]]
+    }
+  )
 }

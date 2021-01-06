@@ -1,5 +1,6 @@
 library(shinydashboard)
 library(shinyjs)
+library(shinybusy)
 
 dashboardPage(
   skin = "red",
@@ -43,11 +44,16 @@ dashboardPage(
         "#inline label{ display: table-cell; text-align: center; vertical-align: middle; color: white }
          #inline .form-group { display: table-row }"
       ),
+      tags$style(
+        type = "text/css",
+        ".modal-dialog { width: fit-content !important; }"
+      ),
       tags$style(HTML(".small-box {height: 80px}")),
       tags$style(HTML("h3 { margin-top : 0 }")),
-      tags$style(HTML("h4 { margin-top : 0 }"))
+      tags$style(HTML("h4 { margin-top : 0 }")),
     ),
     useShinyjs(),
+    use_busy_spinner(spin = "fading-circle", position = "full-page"),
     tabItems(
       tabItem(
         tabName = "simuMonitorTab", simuMonitorUI("simuMonitor")

@@ -3,8 +3,16 @@ settingsMenuUI <- function(id) {
   
   tags$li(
     class = "dropdown",
-    style = "padding-right: 25px; padding-top: 8px",
-    makeButton(ns("refreshTop"), "Call top", "redo")
+    tags$li(
+      class = "dropdown",
+      style = "padding-right: 40px; padding-top: 8px",
+      makeButton(ns("refreshTop"), "Call top", "redo")
+    ),
+    tags$li(
+      class = "dropdown",
+      style = "padding-right: 25px; padding-top: 8px",
+      makeButton(ns("refreshFiles"), "Refresh Files", "redo")
+    )
   )
 }
 

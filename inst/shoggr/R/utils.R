@@ -67,7 +67,6 @@ eval_parse_text <- function(text) {
   eval(parse(text = text))
 }
 
-
 countFinishedIters <- function(currents, totals) {
   if (length(currents) > 1) {
     finishedItersInLowerConditions <- (currents[1] - 1) * prod(totals[-1])
