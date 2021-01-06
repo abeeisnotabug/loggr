@@ -14,7 +14,7 @@ log_progress <- function(..., loggr_object, expr) {
   count <- !loggr_object$count_explicitly
 
   logg_this_condition <- function(c) {
-    logg_condition(c = c, start_time, loggr_object$parent_id, worker_id, it_count, raw_list, raw_values, log_file_names$err)
+    logg_condition(c = c, get_time(), loggr_object$parent_id, worker_id, it_count, raw_list, raw_values, log_file_names$err)
   }
 
   logg_iteration("start", start_time, loggr_object$parent_id, worker_id, it_count, raw_list, raw_values, log_file_names$out)
@@ -52,5 +52,5 @@ log_progress <- function(..., loggr_object, expr) {
 
 #'@export
 dontcount <- function() {
-  message(prefix("countNOT"), appendLF = FALSE)
+  message(prefix("countNOT\n"), appendLF = FALSE)
 }
