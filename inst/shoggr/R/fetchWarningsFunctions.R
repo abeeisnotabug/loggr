@@ -6,8 +6,6 @@ fetchWarnings <- function(files, simuPath) {
     }
   )
   
-  saveRDS(rawErrFiles, "rawErrFiles.rds")
-  
   loggrIndicator <- getOption("loggr.log.prefix")
 
   tib <- lapply(
@@ -37,8 +35,6 @@ fetchWarnings <- function(files, simuPath) {
     }
   ) %>% 
     bind_rows(.id = "workerFile")
-  
-  print(tib)
   
   list(rawErrFiles = rawErrFiles, tib = tib)
 }

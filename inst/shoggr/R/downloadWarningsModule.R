@@ -36,7 +36,6 @@ downloadWarningsServer <- function(id, pickedSimu, errFiles, scriptTime, thisScr
           text = "Fetching exceptions from all workers..."
         )
         combinedErrFiles <- fetchWarnings(errFiles[[scriptTime]], pickedSimu)
-        saveRDS(combinedErrFiles, "combinedErrFiles.rds")
         remove_modal_spinner()
         
         showModal(
@@ -69,7 +68,7 @@ downloadWarningsServer <- function(id, pickedSimu, errFiles, scriptTime, thisScr
           },
           content = function(fname) {
             warnPath <- file.path(pickedSimu, "warns")
-            dir.create(warnPath)
+            dir.create(warnPath, showWarnings = FALSE)
             
             writtenFiles <- combinedErrFiles$tib %>%
               rowwise %>% 
