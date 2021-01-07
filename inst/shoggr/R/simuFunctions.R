@@ -90,7 +90,7 @@ makeMonitors <- function(session, scriptOutInfos, simuPath, topout, monitorPrefi
           flog.debug(paste(workerFileName, workerPID %in% topout$procs_df$PID))
           if (workerPID %in% topout$procs_df$PID) {
             reactiveFileReader(
-              1000,
+              60 * 1000,
               session,
               workerFilePath,
               readLines
