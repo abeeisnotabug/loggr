@@ -83,6 +83,6 @@ getDigitsToRound <- function(secondsToRound) {
 }
 
 roundSecondsToPeriod <- function(secondsToRound, addUnit = NULL) {
-  toPaste <- round(seconds_to_period(secondsToRound), getDigitsToRound(secondsToRound))
+  toPaste <- seconds_to_period(round(secondsToRound, getDigitsToRound(secondsToRound)))
   paste0(toPaste, if (is.na(toPaste)) NULL else addUnit)
 }

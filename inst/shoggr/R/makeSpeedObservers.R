@@ -1,8 +1,8 @@
-makeSpeedObservers <- function(currentWorkerStati, scriptSpeeds, scriptOutInfos, finishedItersPerScript) {
+makeSpeedObservers <- function(currentWorkerStati, scriptSpeeds, scriptOutInfos) {
   lapply(
     names(currentWorkerStati),
     function(scriptTime) {
-      observeEvent(finishedItersPerScript[[scriptTime]], {
+      observeEvent(reactiveValuesToList(currentWorkerStati[[scriptTime]]), {
         flog.info(paste("makeSpeedObserver", scriptTime))
         
         thisScriptWorkerStati <- reactiveValuesToList(currentWorkerStati[[scriptTime]])
