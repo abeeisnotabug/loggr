@@ -55,7 +55,7 @@ downloadWarningsServer <- function(id, pickedSimu, errFiles, scriptTime, thisScr
           
           DT::datatable(
             combinedErrFiles$tib %>%
-              group_by_at(vars(c("condition", chosenIteratorPosition))) %>%
+              group_by_at(vars(all_of(c("condition", chosenIteratorPosition)))) %>%
               summarise("No. Warn." = n(), .groups = "drop") %>% 
               pivot_wider(names_from = condition, values_from = `No. Warn.`, values_fill = 0) %>% 
               arrange_at(vars(all_of(chosenIteratorPosition))),
@@ -71,10 +71,12 @@ downloadWarningsServer <- function(id, pickedSimu, errFiles, scriptTime, thisScr
             warnPath <- file.path(pickedSimu, "warns")
             dir.create(warnPath, showWarnings = FALSE)
             
+            chosenIteratorPosition <- iteratorNames[1:which(iteratorNames == input$groupingLevelPicker)]
+            
             writtenFiles <- combinedErrFiles$tib %>%
               rowwise %>% 
               mutate(seqs = list(seq(starts, ends))) %>% 
-              group_by_at(vars(c(iteratorNames[1:which(iteratorNames == input$groupingLevelPicker)], workerFile))) %>%
+              group_by_at(vars(all_of(c(chosenIteratorPosition, workerFile)))) %>%
               summarise(lineNumbers = list(do.call(c, seqs)), .groups = "keep") %>% 
               summarise(linesToWrite = list(combinedErrFiles$rawErrFiles[[workerFile]][lineNumbers[[1]]]), .groups = "keep") %>% 
               ungroup(workerFile) %>%
