@@ -77,7 +77,7 @@ simuMonitorServer <- function(id, pickedSimu, topout, settingsInput) {
       makeWorkerStatusObservers(workerOutMonitors, currentWorkerStati, scriptOutInfos)
       makeProcessStatusObservers(scriptOutInfos, processStati, topout)
       makeSpeedObservers(currentWorkerStati, scriptSpeeds, scriptOutInfos)
-      makeCurrentIterUpdateObservers(currentWorkerStati, currentStarts, currentEnds, scriptOutInfos)
+      makeCurrentIterUpdateObservers(currentWorkerStati, currentStarts, currentEnds, scriptOutInfos, session)
       makeFinishedItersPerScriptObserver(finishedItersPerScript, scriptOutInfos, currentEnds, currentStarts)
       mainProgressBarServer("mainProgBar", scriptOutInfos, combinedIterators, currentEnds, finishedItersPerScript, processStati)
       scriptBoxesServer("progBoxesByScript", scriptOutInfos, currentStarts, currentWorkerStati, finishedItersPerScript, processStati, scriptSpeeds, pickedSimu, errFiles)

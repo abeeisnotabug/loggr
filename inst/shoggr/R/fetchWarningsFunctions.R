@@ -19,8 +19,8 @@ fetchWarnings <- function(files, simuPath) {
         ";",
         6
       )
-      
-      rawSplitLines[, 1:5] %>% 
+
+      rawSplitLines[, 1:5, drop = FALSE] %>% 
         `colnames<-`(c("condition", "logTime", "parentPID", "workerPID", "iterationCounter")) %>% 
         as_tibble %>% 
         bind_cols(

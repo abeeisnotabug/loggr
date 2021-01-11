@@ -1,4 +1,4 @@
-makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, currentEnds, scriptOutInfos) {
+makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, currentEnds, scriptOutInfos, session) {
   lapply(
     names(currentWorkerStati),
     function(scriptTime) {
@@ -7,8 +7,9 @@ makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, cu
         function(currentWorkerName) {
           observeEvent(currentWorkerStati[[scriptTime]][[currentWorkerName]], {
             currentWorkerStatus <- currentWorkerStati[[scriptTime]][[currentWorkerName]]
-            
-            req(reactiveValuesToList(currentWorkerStati[[scriptTime]]))
+            currentWorkerStatiScriptList <- reactiveValuesToList(currentWorkerStati[[scriptTime]])
+                                                                 
+            req(currentWorkerStatiScriptList)
             
             flog.info(paste("currentIterUpdateObserver", scriptTime))
             
@@ -18,9 +19,29 @@ makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, cu
                 sapply(
                   names(startEnd$iteratorValues),
                   function(iteratorName) {
-                    which(
+                    whichStep <- which(
                       scriptOutInfos[[scriptTime]]$iterators[[iteratorName]] == startEnd$iteratorValues[[iteratorName]]
                     )
+                    
+                    if (length(whichStep) < 1) {
+                      shinyWidgets::sendSweetAlert(
+                        session = session,
+                        title = "Iterator not initialized",
+                        text = sprintf("The value '%s' was not initialized for the iterator '%s'. Appending value.
+                                       Progress and time calculations will be wrong. Please repair the file %s",
+                                       startEnd$iteratorValues[[iteratorName]], iteratorName,
+                                       scriptOutInfos[[scriptTime]]$files %>% filter(prefix == "s") %>% .$fileName),
+                        type = "warning"
+                      )
+                      
+                      scriptOutInfos[[scriptTime]]$iterators[[iteratorName]] <<- c(
+                        scriptOutInfos[[scriptTime]]$iterators[[iteratorName]], startEnd$iteratorValues[[iteratorName]]
+                      )
+                      
+                      length(scriptOutInfos[[scriptTime]]$iterators[[iteratorName]])
+                    } else {
+                      whichStep
+                    }
                   }
                 )
               }
@@ -48,7 +69,7 @@ makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, cu
               FALSE
             }
             
-            allEnds <- !"start" %in% unlist(lapply(reactiveValuesToList(currentWorkerStati[[scriptTime]]), names))
+            allEnds <- !"start" %in% unlist(lapply(currentWorkerStatiScriptList, names))
             
             if (hasStartIteratorsToUpdate) {
               lapply(
