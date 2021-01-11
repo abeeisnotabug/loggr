@@ -76,7 +76,7 @@ downloadWarningsServer <- function(id, pickedSimu, errFiles, scriptTime, thisScr
             writtenFiles <- combinedErrFiles$tib %>%
               rowwise %>% 
               mutate(seqs = list(seq(starts, ends))) %>% 
-              group_by_at(vars(all_of(c(chosenIteratorPosition, workerFile)))) %>%
+              group_by_at(vars(all_of(c(chosenIteratorPosition, "workerFile")))) %>%
               summarise(lineNumbers = list(do.call(c, seqs)), .groups = "keep") %>% 
               summarise(linesToWrite = list(combinedErrFiles$rawErrFiles[[workerFile]][lineNumbers[[1]]]), .groups = "keep") %>% 
               ungroup(workerFile) %>%
