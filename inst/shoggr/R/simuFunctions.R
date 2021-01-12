@@ -112,7 +112,7 @@ getCombinedIterators <- function(scriptOutInfos) {
   )
   
   names(allIterators) <- NULL
-  cList <- do.call(c, allIterators)
+  cList <- do.call(base::c, allIterators)
   
   lapply(
     makeSelfNamedVector(unique(names(cList))),
