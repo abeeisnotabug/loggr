@@ -65,7 +65,6 @@ Overwrite the current directory?
     } else if (overwrite) {
       unlink(simu_log_folder_path, recursive = TRUE)
       dir.create(simu_log_folder_path)
-      # dir.create(file.path(simu_log_folder_path, "exception_dumps"))
     }
   }
 
