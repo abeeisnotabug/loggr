@@ -64,11 +64,11 @@ simuMonitorServer <- function(id, pickedSimu, topout, settingsInput) {
         function(script) {
           scriptTime <- script$callTime
 
-          currentWorkerStati[[scriptTime]] <<- do.call(reactiveValues, makeInitialWorkerStati(script))
-          currentStarts[[scriptTime]] <<- do.call(reactiveValues, makeInitialIterCounters(script))
-          currentEnds[[scriptTime]] <<- do.call(reactiveValues, makeInitialIterCounters(script))
+          currentWorkerStati[[scriptTime]] <<- do.call(shiny::reactiveValues, makeInitialWorkerStati(script))
+          currentStarts[[scriptTime]] <<- do.call(shiny::reactiveValues, makeInitialIterCounters(script))
+          currentEnds[[scriptTime]] <<- do.call(shiny::reactiveValues, makeInitialIterCounters(script))
           processStati$scripts[[scriptTime]] <- "N"
-          processStati$workers[[scriptTime]] <<- do.call(reactiveValues, makeInitialWorkerStati(script, "N"))
+          processStati$workers[[scriptTime]] <<- do.call(shiny::reactiveValues, makeInitialWorkerStati(script, "N"))
           scriptSpeeds[[scriptTime]] <- list(overall = NA, current = NA)
         }
       )

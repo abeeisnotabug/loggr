@@ -77,14 +77,14 @@ downloadWarningsServer <- function(id, pickedSimu, errFiles, scriptTime, thisScr
               rowwise %>% 
               mutate(seqs = list(seq(starts, ends))) %>% 
               group_by_at(vars(all_of(c(chosenIteratorPosition, "workerFile")))) %>%
-              summarise(lineNumbers = list(do.call(c, seqs)), .groups = "keep") %>% 
+              summarise(lineNumbers = list(do.call(base::c, seqs)), .groups = "keep") %>% 
               summarise(linesToWrite = list(combinedErrFiles$rawErrFiles[[workerFile]][lineNumbers[[1]]]), .groups = "keep") %>% 
               ungroup(workerFile) %>%
               group_map(
                 ~ {
                   fileName <- file.path(warnPath, paste0(paste0(names(.y), "_", .y[1, ], collapse = "."), ".txt"))
                   writeLines(
-                    do.call(c, .x$linesToWrite),
+                    do.call(base::c, .x$linesToWrite),
                     fileName
                   )
                   fileName

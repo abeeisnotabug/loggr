@@ -47,8 +47,8 @@ workerTablesByScriptServer <- function(id, thisScriptWorkerStati, thisScriptWork
               thisScriptWorkerStati[[workerName]],
               function(startEnd) {
                 tibble(S = as.character(icons[[thisScriptWorkerProcessStati[[workerName]]]])) %>% 
-                  bind_cols(do.call(tibble, startEnd$loggrValues)) %>% 
-                  bind_cols(do.call(tibble, startEnd$iteratorValues))
+                  bind_cols(do.call(dplyr::tibble, startEnd$loggrValues)) %>% 
+                  bind_cols(do.call(dplyr::tibble, startEnd$iteratorValues))
               }
             ) %>% bind_rows(.id = "status")
           }

@@ -32,7 +32,7 @@ mainProgressBarServer <- function(id, scriptOutInfos, combinedIterators, current
         
         localFinishedItersPerScript <- isolate(reactiveValuesToList(finishedItersPerScript))
 
-        finishedItersSum <- isolate(do.call(sum, localFinishedItersPerScript[nonDuplicatedScripts]))
+        finishedItersSum <- isolate(do.call(base::sum, localFinishedItersPerScript[nonDuplicatedScripts]))
         
         processStatiList <- list(
           scripts = reactiveValuesToList(processStati$scripts),
@@ -76,7 +76,7 @@ mainProgressBarServer <- function(id, scriptOutInfos, combinedIterators, current
         
         localFinishedItersPerScript <- isolate(reactiveValuesToList(finishedItersPerScript))
         
-        finishedItersSum <- isolate(do.call(sum, localFinishedItersPerScript[nonDuplicatedScripts]))
+        finishedItersSum <- isolate(do.call(base::sum, localFinishedItersPerScript[nonDuplicatedScripts]))
         
         flog.info("mainProgBarSERVER")
         

@@ -21,7 +21,7 @@ makeSpeedObservers <- function(currentWorkerStati, scriptSpeeds, scriptOutInfos)
         )
         
         currentIterCount <- do.call(
-          sum,
+          base::sum,
           lapply(
             thisScriptWorkerStati,
             function(worker) {
