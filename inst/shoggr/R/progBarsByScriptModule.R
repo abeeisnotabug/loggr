@@ -2,7 +2,7 @@ progBarsByScriptUI <- function(id, thisScriptOutInfos, thisScriptStarts, thisScr
   ns <- NS(id)
 
   scriptVars <- names(thisScriptOutInfos$iterators)
-  progBarsToMake <- scriptVars[sapply(thisScriptOutInfos$iterators, length) > 1]
+  progBarsToMake <- scriptVars[sapply(thisScriptOutInfos$iterators, base::length) > 1]
   iterCounts <- thisScriptOutInfos$iterCounts
   scriptProcessStatusBool <- scriptProcessStati[[scriptTime]] != "N"
 
@@ -12,7 +12,7 @@ progBarsByScriptUI <- function(id, thisScriptOutInfos, thisScriptStarts, thisScr
       currentIter <- isolate(thisScriptStarts[[iteratorName]])
       iteratorTotal <- iterCounts[[iteratorName]]
       flog.info(paste("progBar", scriptTime, iteratorName, "scriptProcessStatus", scriptProcessStatusBool))
-      
+
       progressBar(
         id = ns(paste0(scriptTime, ".", iteratorName)),
         title = iteratorName,
@@ -37,10 +37,10 @@ progBarsByScriptServer <- function(id, thisScriptStarts, thisScriptOutInfos, scr
           observeEvent(thisScriptStarts[[iteratorName]], {
             currentIter <- thisScriptStarts[[iteratorName]]
             iteratorTotal <- thisScriptOutInfos$iterCounts[[iteratorName]]
-            
+
             flog.info(paste("probBarsByScript", scriptTime, iteratorName))
             flog.debug(paste(currentIter, iteratorTotal))
-            
+
             updateProgressBar(
               session = session,
               id = paste0(scriptTime, ".", iteratorName),

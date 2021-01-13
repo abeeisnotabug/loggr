@@ -8,28 +8,28 @@ run_and_log <- function(simu_name, ..., append = FALSE, count_explicitly = FALSE
   call_args <- as.list(match.call(expand.dots = FALSE))
   scripts <- call_args$...
 
-  if (any(!sapply(scripts, is.character))) {
+  if (any(!sapply(scripts, base::is.character))) {
     stop(
       sprintf(
 "%s not a character string.
 The ... must be paths to .R files relative to the current working directory.",
-        paste(scripts[!sapply(scripts, is.character)], collapse = ", ")
+        paste(scripts[!sapply(scripts, base::is.character)], collapse = ", ")
       )
     )
   }
 
-  if (any(!sapply(scripts, file.exists))) {
+  if (any(!sapply(scripts, base::file.exists))) {
     cat(dir(), sep = "\n")
     stop(
       sprintf(
         "%s not found. Above are the contents of your current working directory.",
-        paste(scripts[!sapply(scripts, file.exists)], collapse = ", ")
+        paste(scripts[!sapply(scripts, base::file.exists)], collapse = ", ")
       )
     )
   }
 
-  if (any(!sapply(scripts, endsWith, ".R"))) {
-    for (script in scripts[!sapply(scripts, endsWith, ".R")]) {
+  if (any(!sapply(scripts, base::endsWith, ".R"))) {
+    for (script in scripts[!sapply(scripts, base::endsWith, ".R")]) {
       if (!askYesNo(sprintf("%s should be a .R file, continue anyway?", script))) {
         return(NULL)
       }
@@ -71,7 +71,7 @@ Overwrite the current directory?
   ##### Execute Scripts and log in log_folder #####
   pids <- sapply(
     scripts,
-    make_Rscript_call,
+    loggr:::make_Rscript_call,
     simu_log_folder_path,
     count_explicitly
   )

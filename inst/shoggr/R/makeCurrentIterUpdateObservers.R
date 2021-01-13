@@ -8,11 +8,11 @@ makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, cu
           observeEvent(currentWorkerStati[[scriptTime]][[currentWorkerName]], {
             currentWorkerStatus <- currentWorkerStati[[scriptTime]][[currentWorkerName]]
             currentWorkerStatiScriptList <- reactiveValuesToList(currentWorkerStati[[scriptTime]])
-                                                                 
+
             req(currentWorkerStatiScriptList)
-            
+
             flog.info(paste("currentIterUpdateObserver", scriptTime))
-            
+
             workerProgress <- lapply(
               currentWorkerStatus,
               function(startEnd) {
@@ -22,7 +22,7 @@ makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, cu
                     whichStep <- which(
                       scriptOutInfos[[scriptTime]]$iterators[[iteratorName]] == startEnd$iteratorValues[[iteratorName]]
                     )
-                    
+
                     if (length(whichStep) < 1) {
                       shinyWidgets::sendSweetAlert(
                         session = session,
@@ -33,11 +33,11 @@ makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, cu
                                        scriptOutInfos[[scriptTime]]$files %>% filter(prefix == "s") %>% .$fileName),
                         type = "warning"
                       )
-                      
+
                       scriptOutInfos[[scriptTime]]$iterators[[iteratorName]] <<- c(
                         scriptOutInfos[[scriptTime]]$iterators[[iteratorName]], startEnd$iteratorValues[[iteratorName]]
                       )
-                      
+
                       length(scriptOutInfos[[scriptTime]]$iterators[[iteratorName]])
                     } else {
                       whichStep
@@ -46,9 +46,9 @@ makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, cu
                 )
               }
             )
-            
+
             flog.debug(str(workerProgress))
-            
+
             hasStartIteratorsToUpdate <- if (!is.null(currentWorkerStatus$start)) {
               checkIfIteredMore(
                 scriptOutInfos[[scriptTime]]$iterCounts,
@@ -58,7 +58,7 @@ makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, cu
             } else {
               FALSE
             }
-            
+
             hasEndIteratorsToUpdate <- if (!is.null(currentWorkerStatus$end)) {
               checkIfIteredMore(
                 scriptOutInfos[[scriptTime]]$iterCounts,
@@ -68,9 +68,9 @@ makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, cu
             } else {
               FALSE
             }
-            
-            allEnds <- !"start" %in% unlist(lapply(currentWorkerStatiScriptList, names))
-            
+
+            allEnds <- !"start" %in% unlist(lapply(currentWorkerStatiScriptList, base::names))
+
             if (hasStartIteratorsToUpdate) {
               lapply(
                 names(workerProgress$start),
@@ -86,7 +86,7 @@ makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, cu
                 }
               )
             }
-            
+
             if (hasEndIteratorsToUpdate) {
               lapply(
                 names(workerProgress$end),
@@ -95,7 +95,7 @@ makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, cu
                 }
               )
             }
-            
+
             flog.debug(str(reactiveValuesToList(currentStarts[[scriptTime]])))
             flog.debug(str(reactiveValuesToList(currentEnds[[scriptTime]])))
           })
@@ -109,6 +109,6 @@ checkIfIteredMore <- function(iterCounts, currentIters, newCurrentIters) {
   totalsVec <- unlist(iterCounts)
   currentsVec <- unlist(currentIters)[names(totalsVec)]
   newCurrentsVec <- unlist(newCurrentIters)[names(totalsVec)]
-  
+
   countFinishedIters(newCurrentsVec, totalsVec) > countFinishedIters(currentsVec, totalsVec)
 }

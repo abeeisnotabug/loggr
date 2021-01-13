@@ -64,9 +64,9 @@ prepare_iterator_variable_names <- function(iterator_list) {
 
 prepare_iterator_values <- function(iterator_values) {
   ifelse(
-    sapply(iterator_values, is.character),
+    sapply(iterator_values, base::is.character),
     ifelse(
-      sapply(iterator_values, length) > 1,
+      sapply(iterator_values, base::length) > 1,
       sprintf("%s", iterator_values),
       sprintf(
         "\"%s\"",

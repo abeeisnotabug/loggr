@@ -3,7 +3,7 @@ library(shinyWidgets)
 
 mainProgressBarUI <- function(id) {
   ns <- NS(id)
-  
+
   uiOutput(ns("mainProgressBarBox"))
 }
 
@@ -12,31 +12,31 @@ mainProgressBarServer <- function(id, scriptOutInfos, combinedIterators, current
     id,
     function(input, output, session) {
       ns <- session$ns
-      
-      overallIters <- prod(sapply(combinedIterators, length))
-      
+
+      overallIters <- prod(sapply(combinedIterators, base::length))
+
       output$mainProgressBarBox <- renderUI({
         req(reactiveValuesToList(finishedItersPerScript))
-        
+
         flog.info("mainProgBarUI")
-        
+
         nonDuplicatedScripts <- names(scriptOutInfos)[
           !duplicated(
             lapply(
               scriptOutInfos,
-              `[[`,
+              base::`[[`,
               "iterators"
             )
           )
         ]
-        
+
         localFinishedItersPerScript <- isolate(reactiveValuesToList(finishedItersPerScript))
 
         finishedItersSum <- isolate(do.call(base::sum, localFinishedItersPerScript[nonDuplicatedScripts]))
-        
+
         processStatiList <- list(
           scripts = reactiveValuesToList(processStati$scripts),
-          workers = lapply(processStati$workers, reactiveValuesToList)
+          workers = lapply(processStati$workers, shiny::reactiveValuesToList)
         )
         allProcessStati <- unlist(processStatiList)
         overallIcon <- if (all(allProcessStati != "N"))
@@ -45,7 +45,7 @@ mainProgressBarServer <- function(id, scriptOutInfos, combinedIterators, current
           icons$failure
         else
           icons$N
-        
+
         fluidRow(
           box(
             width = 12,
@@ -62,24 +62,24 @@ mainProgressBarServer <- function(id, scriptOutInfos, combinedIterators, current
           )
         )
       })
-      
+
       observe({
         nonDuplicatedScripts <- names(scriptOutInfos)[
           !duplicated(
             lapply(
               scriptOutInfos,
-              `[[`,
+              base::`[[`,
               "iterators"
             )
           )
         ]
-        
+
         localFinishedItersPerScript <- isolate(reactiveValuesToList(finishedItersPerScript))
-        
+
         finishedItersSum <- isolate(do.call(base::sum, localFinishedItersPerScript[nonDuplicatedScripts]))
-        
+
         flog.info("mainProgBarSERVER")
-        
+
         updateProgressBar(
           session = session,
           id = "mainProgBar",

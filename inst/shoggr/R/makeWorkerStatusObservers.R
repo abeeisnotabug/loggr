@@ -6,13 +6,13 @@ makeWorkerStatusObservers <- function(workerOutMonitors, currentWorkerStati, scr
         names(workerOutMonitors[[scriptTime]]),
         function(workerOutName) {
           workerOutMonitor <- workerOutMonitors[[scriptTime]][[workerOutName]]
-          
+
           observeEvent(workerOutMonitor(), {
             req(workerOutMonitor())
-            
+
             currentWorkerStatus <- getCurrentWorkerStatus(workerOutMonitor())
             currentWorkerStati[[scriptTime]][[workerOutName]] <- currentWorkerStatus
-            
+
             flog.info(paste("workerStatusObserver", scriptTime))
           })
         }
@@ -23,11 +23,11 @@ makeWorkerStatusObservers <- function(workerOutMonitors, currentWorkerStati, scr
 
 getCurrentWorkerStatus <- function(workerLines) {
   loggrIndicator <- getOption("loggr.log.prefix")
-  processedWorkerLines <- str_extract(workerLines, sprintf("(?<=%s)(.+)", loggrIndicator)) %>% 
+  processedWorkerLines <- str_extract(workerLines, sprintf("(?<=%s)(.+)", loggrIndicator)) %>%
     str_split(";", 6)
-  
-  names(processedWorkerLines) <- sapply(processedWorkerLines, `[[`, 1)
-  
+
+  names(processedWorkerLines) <- sapply(processedWorkerLines, base::`[[`, 1)
+
   lapply(
     processedWorkerLines,
     function(processedWorkerLine)
