@@ -75,7 +75,7 @@ simuPickerServer <- function(id, topLevelSession, topout) {
             
           div(
             align = "center",
-            h5(span("Monitoring Simu:", icons[[simuRunStatus]], input$simuPicker))
+            h5(span(icons[[simuRunStatus]], input$simuPicker))
           )
         })
         
