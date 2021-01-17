@@ -3,5 +3,6 @@
 export(dontcount)
 export(initialize_progress)
 export(log_progress)
+export(observe_speed)
 export(run_and_log)
 export(shoggr)
