@@ -74,7 +74,7 @@ countFinishedIters <- function(currents, totals) {
     
     sum(finishedItersInLowerConditions, finishedItersInThisCondition)
   } else {
-    currents
+    unname(currents)
   }
 }
 

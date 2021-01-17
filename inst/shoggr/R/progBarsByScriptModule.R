@@ -38,9 +38,9 @@ progBarsByScriptServer <- function(id, thisScriptStarts, thisScriptOutInfos, scr
             currentIter <- thisScriptStarts[[iteratorName]]
             iteratorTotal <- thisScriptOutInfos$iterCounts[[iteratorName]]
 
-            flog.info(paste("probBarsByScript", scriptTime, iteratorName))
+            flog.info(paste("progBarsByScript", scriptTime, iteratorName))
             flog.debug(paste(currentIter, iteratorTotal))
-
+            
             updateProgressBar(
               session = session,
               id = paste0(scriptTime, ".", iteratorName),
