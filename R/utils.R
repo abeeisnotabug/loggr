@@ -1,5 +1,5 @@
-get_time <- function() {
-  format(Sys.time(), "%y.%m.%d.%H.%M.%OS6")
+get_time <- function(mus = 6) {
+  format(Sys.time(), paste0("%y.%m.%d.%H.%M.%OS", mus))
 }
 
 make_Rscript_call <- function(script, simu_log_folder_path, count_explicitly) {

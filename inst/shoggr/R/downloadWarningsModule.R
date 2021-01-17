@@ -42,9 +42,10 @@ downloadWarningsServer <- function(id, pickedSimu, errFiles, scriptTime, thisScr
           modalDialog(
             title = "Download logged conditions",
             pickerInput(ns("groupingLevelPicker"), "Pick maximum level of grouping", choices = iteratorNames),
+            materialSwitch(ns("noGroupingSwitch"), "Make single file for download", status = "danger", right = TRUE),
             dataTableOutput(ns("errTib")),
             footer = tagList(
-              downloadButton(ns("downloadWarnings"), "Download warnings in seperate files by grouping"),
+              downloadButton(ns("downloadWarnings"), "Download split conditions"),
               modalButton("Close")
             )
           )
@@ -65,24 +66,33 @@ downloadWarningsServer <- function(id, pickedSimu, errFiles, scriptTime, thisScr
         
         output$downloadWarnings <- downloadHandler(
           filename = function() {
-            paste(scriptTime, "warnings", "zip", sep = ".")
+            paste(basename(pickedSimu), "conditions", loggr:::get_time(0), "zip", sep = ".")
           },
           content = function(fname) {
             warnPath <- file.path(pickedSimu, "warns")
             dir.create(warnPath, showWarnings = FALSE)
             
-            chosenIteratorPosition <- iteratorNames[1:which(iteratorNames == input$groupingLevelPicker)]
+            iteratorGrouping <- if (input$noGroupingSwitch) {
+              "workerFile"
+            } else {
+              c(iteratorNames[1:which(iteratorNames == input$groupingLevelPicker)], "workerFile")
+            }
             
             writtenFiles <- combinedErrFiles$tib %>%
               rowwise %>% 
               mutate(seqs = list(seq(starts, ends))) %>% 
-              group_by_at(vars(all_of(c(chosenIteratorPosition, "workerFile")))) %>%
+              group_by_at(vars(all_of(iteratorGrouping))) %>%
               summarise(lineNumbers = list(do.call(base::c, seqs)), .groups = "keep") %>% 
               summarise(linesToWrite = list(combinedErrFiles$rawErrFiles[[workerFile]][lineNumbers[[1]]]), .groups = "keep") %>% 
               ungroup(workerFile) %>%
               group_map(
                 ~ {
-                  fileName <- file.path(warnPath, paste0(paste0(names(.y), "_", .y[1, ], collapse = "."), ".txt"))
+                  conditionFileName <- if (input$noGroupingSwitch) {
+                    paste(basename(pickedSimu), "conditions", "txt", sep = ".")
+                  } else {
+                    paste0(paste0(names(.y), "_", .y[1, ], collapse = "."), ".txt")
+                  }
+                  fileName <- file.path(warnPath, conditionFileName)
                   writeLines(
                     do.call(base::c, .x$linesToWrite),
                     fileName
