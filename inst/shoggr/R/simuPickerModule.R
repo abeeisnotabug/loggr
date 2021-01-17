@@ -11,11 +11,8 @@ simuPickerUI <- function(id) {
     pickerInput(
       inputId = ns("simuPicker"),
       label = "Pick a Simulation",
-      choices = dir(logFolderPath),
-      options = list(`live-search` = TRUE)#,
-      # choicesOpt = list(
-      #   style = rep(sprintf("color: %s", dropDownColor), length(dir(logFolderPath)))
-      # )
+      choices = dir(logFolderPath)[dir(logFolderPath) != "loggr_speed_observer"],
+      options = list(`live-search` = TRUE)
     ),
     makeButton(ns("pickButton"), "Pick", "paper-plane"),
     uiOutput(ns("pickedSimuDisplay"))
@@ -32,9 +29,10 @@ simuPickerServer <- function(id, topLevelSession, topout) {
       observeEvent(topout(), {
         pickedSimuBeforeRefresh <- input$simuPicker
         logFolderContents <- dir(logFolderPath)
+        simuFolders <- logFolderContents[logFolderContents != "loggr_speed_observer"]
         
         doesSimuRun <- lapply(
-          makeSelfNamedVector(logFolderContents),
+          makeSelfNamedVector(simuFolders),
           function(simuFolder) {
             getSimuRunStatus(file.path(logFolderPath, simuFolder), topout)
           }
@@ -49,11 +47,11 @@ simuPickerServer <- function(id, topLevelSession, topout) {
         updatePickerInput(
           session = session,
           inputId = "simuPicker",
-          choices = logFolderContents,
-          selected = if (pickedSimuBeforeRefresh %in% logFolderContents) pickedSimuBeforeRefresh else NULL,
+          choices = simuFolders,
+          selected = if (pickedSimuBeforeRefresh %in% simuFolders) pickedSimuBeforeRefresh else NULL,
           choicesOpt = list(
             icon = simuIcons,
-            style = rep(sprintf("color: %s", dropDownColor), length(logFolderContents))
+            style = rep(sprintf("color: %s", dropDownColor), length(simuFolders))
           )
         )
       })
