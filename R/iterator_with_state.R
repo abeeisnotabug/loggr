@@ -1,4 +1,4 @@
-iterator_with_state <- bubu <- function() {
+iterator_with_state <- function() {
   i <- 0L
 
   nextEl <- function() (i <<- i + 1L)
