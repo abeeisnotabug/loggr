@@ -3,7 +3,7 @@ library(DT)
 
 serverMonitorUI <- function(id) {
   ns <- NS(id)
-  
+
   fluidPage(
     fluidRow(
       valueBoxOutput(ns("ramBox")),
@@ -25,28 +25,28 @@ serverMonitorServer <- function(id, settingsInput) {
   moduleServer(
     id,
     function(input, output, session) {
-      topReactive <- reactiveVal(top())
-      
+      topReactive <- reactiveVal(loggr:::top())
+
       # observe({
       #   invalidateLater(10000, session)
       #   topReactive(top())
       # })
       observeEvent(settingsInput$refreshTop, {
-        topReactive(top())
+        topReactive(loggr:::top())
       })
-      
+
       output$ramBox <- renderValueBox({
         makeMemoryBox("RAM", total = topReactive()$mem_df$mib[1], used = topReactive()$mem_df$mib[3])
       })
-      
+
       output$swapBox <- renderValueBox({
         makeMemoryBox("Swap", total = topReactive()$mem_df$mib[5], used = topReactive()$mem_df$mib[7])
       })
-      
+
       output$cpuBox <- renderValueBox({
         makeCPUBox(32, sum(topReactive()$procs_df$`%CPU` > 90))
       })
-      
+
       output$topTable <- DT::renderDataTable(
         DT::formatRound(
           DT::datatable(
@@ -70,7 +70,7 @@ serverMonitorServer <- function(id, settingsInput) {
           digits = 1
         )
       )
-      
+
       return(reactive(topReactive()))
     }
   )
