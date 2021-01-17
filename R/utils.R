@@ -16,18 +16,35 @@ make_Rscript_call <- function(script, simu_log_folder_path, count_explicitly) {
     )
   )
 
-  system(
-    paste0(
-      "nohup Rscript --vanilla ",  script, " ",
-      "--simu_log_folder_path=", simu_log_folder_path, " ",
-      "--call_time=", call_time, " ",
-      "--count_explicitly=", count_explicitly, " ",
-      "> ", out_and_err_file[1], " ",
-      "2> ", out_and_err_file[2], " ",
-      "& echo $!"
-    ),
-    intern = TRUE
+  system_call_script(
+    script,
+    out_and_err_file,
+    list(
+      simu_log_folder_path = simu_log_folder_path,
+      call_time = call_time,
+      count_explicitly = count_explicitly
+    )
   )
+}
+
+system_call_script <- function(script, out_and_err_file, args) {
+  parsed_args <- paste0("--", names(args), "=", args, collapse = " ")
+
+  call_command <- paste(
+    "nohup", "Rscript", "--vanilla",  script,
+    parsed_args,
+    ">", out_and_err_file[1],
+    "2>", out_and_err_file[2],
+    "&", "echo", "$!"
+  )
+
+  expected_pid <- system(call_command, intern = TRUE)
+
+  if (is.na(strtoi(expected_pid))) {
+    stop(sprintf("Call to run script %s did not return PID: %s", script, expected_pid))
+  } else {
+    strtoi(expected_pid)
+  }
 }
 
 make_logg_file_names <- function(loggr_object) {
