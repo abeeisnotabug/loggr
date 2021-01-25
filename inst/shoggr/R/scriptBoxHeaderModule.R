@@ -4,7 +4,7 @@ scriptBoxHeaderUI <- function(id) {
   uiOutput(ns("scriptBoxHeader"))
 }
 
-scriptBoxHeaderServer <- function(id, thisScriptOutInfos, scriptProcessStati, scriptTime, pickedSimu, errFiles) {
+scriptBoxHeaderServer <- function(id, thisScriptOutInfos, thisScriptWorkerStati, scriptProcessStati, scriptTime, pickedSimu, errFiles) {
   moduleServer(
     id,
     function(input, output, session) {

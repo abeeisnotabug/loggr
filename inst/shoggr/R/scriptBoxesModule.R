@@ -53,6 +53,7 @@ scriptBoxesServer <- function(id, scriptOutInfos, currentStarts, currentWorkerSt
           scriptBoxHeaderServer(
             paste0(scriptTime, ".scriptBoxHeader"),
             scriptOutInfos[[scriptTime]],
+            currentWorkerStati[[scriptTime]],
             processStati$script,
             scriptTime,
             pickedSimu,

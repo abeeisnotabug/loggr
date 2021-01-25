@@ -38,8 +38,6 @@ killCleanupServer <- function(id, thisScriptWorkerStati, pickedSimu, scriptProce
             type = "warning",
             title = "Clean Up Confirmation",
             text = "Are you sure you want to delete all log files belonging to this script?",
-            # btn_labels = c("Soft", "Hard"),
-            # btn_colors = c("blue", "red"),
             showCloseButton = TRUE
           )
         }
@@ -62,7 +60,6 @@ killCleanupServer <- function(id, thisScriptWorkerStati, pickedSimu, scriptProce
               }
             )
             
-            print(killOut)
             session$reload()
           } else {
             simuFiles <- dir(file.path(pickedSimu), full.names = TRUE)
