@@ -16,26 +16,25 @@ initialize_progress <- function(...) {
   parent_id <- Sys.getpid()
 
   if ("-e" %in% command_args) {
-    rscript <- FALSE
+    rscript_file_name <- NA
+    log_folder_path <- "."
     call_time <- format(Sys.time(), "%y.%m.%d-%H.%M.%OS6")
     count_explicitly <- FALSE
   } else {
-    rscript_file_name <- basename(substring(command_args[grepl("--file", command_args)], 8))
-    simu_log_folder_path <- substring(command_args[grepl("--simu_log_folder_path", command_args)], 24)
-    call_time <- substring(command_args[grepl("--call_time", command_args)], 13)
-    count_explicitly <- as.logical(substring(command_args[grepl("--count_explicitly", command_args)], 20))
+    command_args_list <- command_args_as_list(command_args)
 
-    rscript <- TRUE
+    rscript_file_name <- basename(command_args_list$file)
+    log_folder_path <- command_args_list$simu_log_folder_path
+    call_time <- command_args_list$call_time
+    count_explicitly <- command_args_list$count_explicitly
   }
-
-  log_folder_path <- ifelse(rscript, simu_log_folder_path, ".")
 
   cluster_log_file <- paste0(
     "c-",
     call_time,
     "-", parent_id,
     "-NA-",
-    ifelse(rscript, rscript_file_name, "NA"),
+    rscript_file_name,
     ".out"
   )
 
@@ -45,7 +44,7 @@ initialize_progress <- function(...) {
     parent_id = parent_id,
     outfile = file.path(log_folder_path, cluster_log_file),
     call_time = call_time,
-    log_folder_path = ifelse(rscript, log_folder_path, FALSE),
+    log_folder_path = log_folder_path,
     rscript_file_name = rscript_file_name,
     iterator = iterator_with_state(),
     count_explicitly = count_explicitly

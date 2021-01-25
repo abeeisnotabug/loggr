@@ -47,22 +47,25 @@ system_call_script <- function(script, out_and_err_file, args) {
   }
 }
 
-make_logg_file_names <- function(loggr_object) {
-  lapply(
-    c(out = "out", err = "err"),
-    function(file_ext) {
-      file_name <- paste0("w-", loggr_object$call_time, "-", loggr_object$parent_id, "-", Sys.getpid(), "-", loggr_object$rscript_file_name, ".", file_ext)
+command_args_as_list <- function(command_args) {
+  split_command_args <- strsplit(command_args, "=")
+  names(split_command_args) <- lapply(lapply(split_command_args, `[`, 1), substring, 3)
+  lapply(split_command_args, `[`, 2)
+}
 
-      ifelse(
-        isFALSE(loggr_object$log_folder_path),
-        file_name,
-        file.path(
-          loggr_object$log_folder_path,
-          file_name
-        )
-      )
-    }
+make_logg_file_names <- function(loggr_object) {
+  files <- file.path(
+    loggr_object$log_folder_path,
+    paste0(
+      "w-", loggr_object$call_time, "-",
+      loggr_object$parent_id, "-",
+      Sys.getpid(), "-",
+      loggr_object$rscript_file_name, ".",
+      c("out", "err")
+    )
   )
+
+  `names<-`(files, c("out", "err"))
 }
 
 prefix <- function(to_paste = NULL) paste0(getOption("loggr.log.prefix"), to_paste)
