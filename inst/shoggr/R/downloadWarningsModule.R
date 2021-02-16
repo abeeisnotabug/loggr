@@ -12,8 +12,6 @@ downloadWarningsServer <- function(id, pickedSimu, errFiles, scriptTime, thisScr
     function(input, output, session) {
       ns <- session$ns
       
-      combinedErrTib <- reactiveVal()
-      
       output$downloadWarningsButtonUIelement <- renderUI({
         req(errFiles[[scriptTime]] %>% filter(prefix == "w") %>% .$fileName)
         
