@@ -56,7 +56,7 @@ getInfo <- function(simuPath) {
         4
       )
       
-      iterators <- eval_parse_text(sprintf("list(%s)", infos[4]))
+      iterators <- lapply(eval_parse_text(sprintf("list(%s)", infos[4])), unname)
       iterCounts <- lapply(iterators, length)
 
       list(
