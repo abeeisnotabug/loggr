@@ -11,8 +11,17 @@ top <- function() {
   procs_df <- as.data.frame(procs_mat)
   procs_df[1:11] <- lapply(procs_df[1:11], stringr::str_replace_all, ",", ".")
   procs_df[1:11] <- lapply(procs_df[1:11], utils::type.convert, as.is = TRUE)
+  
+  procs_df[, c("VIRT", "RES", "SHR")] <- lapply(
+    procs_df[, c("VIRT", "RES", "SHR")],
+    function(mem_col)
+      ifelse(
+        grepl("[a-z]", mem_col),
+        mem_col,
+        suppressWarnings(as.numeric(mem_col)) / 1024
+      )
+  )
 
-  procs_df[, c("VIRT", "RES", "SHR")] <- procs_df[, c("VIRT", "RES", "SHR")] / 1024
   names(procs_df)[5:7] <- paste(names(procs_df)[5:7], "(MiB)")
 
   mem_mat <- str_split_fixed(top_head[4:5], "[ (?!:)]+", 10)
