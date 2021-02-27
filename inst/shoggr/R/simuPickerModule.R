@@ -28,36 +28,41 @@ simuPickerServer <- function(id, topLevelSession, topout) {
     function(input, output, session) {
       pickedSimu <- reactiveVal(NULL)
       dropDownColor <- "black"
-      
+
       observeEvent(topout(), {
         pickedSimuBeforeRefresh <- input$simuPicker
         logFolderContents <- dir(logFolderPath)
-        
+
         doesSimuRun <- lapply(
           makeSelfNamedVector(logFolderContents),
           function(simuFolder) {
             getSimuRunStatus(file.path(logFolderPath, simuFolder), topout)
           }
         )
-        
+
         simuIcons <- ifelse(
           doesSimuRun,
           rep("glyphicon-play", length(doesSimuRun)),
           rep("glyphicon-stop", length(doesSimuRun))
         )
-        
+
         updatePickerInput(
           session = session,
           inputId = "simuPicker",
           choices = logFolderContents,
-          selected = if (pickedSimuBeforeRefresh %in% logFolderContents) pickedSimuBeforeRefresh else NULL,
+          selected = if (is.null(pickedSimuBeforeRefresh))
+            NULL
+          else if (pickedSimuBeforeRefresh %in% logFolderContents)
+            pickedSimuBeforeRefresh
+          else
+            NULL,
           choicesOpt = list(
             icon = simuIcons,
             style = rep(sprintf("color: %s", dropDownColor), length(logFolderContents))
           )
         )
       })
-      
+
       observeEvent(input$pickButton, {
         lapply(
           c("refreshFolders", "simuPicker", "pickButton"),
@@ -66,28 +71,28 @@ simuPickerServer <- function(id, topLevelSession, topout) {
             hide(actionID)
           }
         )
-        
+
         pickedSimuPath <- file.path(logFolderPath, input$simuPicker)
-        
+
         output$pickedSimuDisplay <- renderUI({
           doesSimuRun <- getSimuRunStatus(pickedSimuPath, topout)
           simuRunStatus <- ifelse(doesSimuRun, "R", "N")
-            
+
           div(
             align = "center",
             h5(span(icons[[simuRunStatus]], input$simuPicker))
           )
         })
-        
+
         updateTabItems(topLevelSession, "tabs", "simuMonitorTab")
-        
+
         pickedSimu(pickedSimuPath)
       })
-      
+
       return(
         reactive({
           req(pickedSimu())
-          
+
           pickedSimu()
         })
       )
