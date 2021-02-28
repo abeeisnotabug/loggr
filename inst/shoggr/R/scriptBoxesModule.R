@@ -1,6 +1,6 @@
 scriptBoxesUI <- function(id) {
   ns <- NS(id)
-  
+
   uiOutput(ns("progBoxesByScript"))
 }
 
@@ -9,10 +9,10 @@ scriptBoxesServer <- function(id, scriptOutInfos, currentStarts, currentWorkerSt
     id,
     function(input, output, session) {
       ns <- session$ns
-      
+
       output$progBoxesByScript <- renderUI({
         req(scriptOutInfos)
-        
+
         lapply(
           names(scriptOutInfos),
           function(scriptTime) {
@@ -46,13 +46,14 @@ scriptBoxesServer <- function(id, scriptOutInfos, currentStarts, currentWorkerSt
           }
         )
       })
-      
+
       lapply(
         names(currentStarts),
         function(scriptTime) {
           scriptBoxHeaderServer(
             paste0(scriptTime, ".scriptBoxHeader"),
             scriptOutInfos[[scriptTime]],
+            currentWorkerStati[[scriptTime]],
             processStati$script,
             scriptTime,
             pickedSimu,

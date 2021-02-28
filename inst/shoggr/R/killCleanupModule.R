@@ -1,6 +1,6 @@
 killCleanupUI <- function(id) {
   ns <- NS(id)
-  
+
   uiOutput(ns("killCleanupButtonUIelement"))
 }
 
@@ -9,7 +9,7 @@ killCleanupServer <- function(id, thisScriptWorkerStati, pickedSimu, scriptProce
     id,
     function(input, output, session) {
       ns <- session$ns
-      
+
       output$killCleanupButtonUIelement <- renderUI({
         actionBttn(
           inputId = ns("killCleanupButton"),
@@ -20,7 +20,7 @@ killCleanupServer <- function(id, thisScriptWorkerStati, pickedSimu, scriptProce
           size = "sm"
         )
       })
-      
+
       observeEvent(input$killCleanupButton, {
         if (scriptProcessStati[[scriptTime]] != "N") {
           ask_confirmation(
@@ -44,7 +44,7 @@ killCleanupServer <- function(id, thisScriptWorkerStati, pickedSimu, scriptProce
           )
         }
       })
-      
+
       observeEvent(input$killConfirm, {
         if (input$killConfirm) {
           if (scriptProcessStati[[scriptTime]] != "N") {
@@ -54,22 +54,22 @@ killCleanupServer <- function(id, thisScriptWorkerStati, pickedSimu, scriptProce
                 workerName[[1]]$loggrValues$workerPID
               }
             )
-            
+
             killOut <- lapply(
               workerPIDs,
               function(workerPID) {
                 system(sprintf("kill %i", workerPID))
               }
             )
-            
+
             print(killOut)
             session$reload()
           } else {
             simuFiles <- dir(file.path(pickedSimu), full.names = TRUE)
             toDelete <- str_subset(simuFiles, scriptTime)
-            
+
             unlink(toDelete)
-            
+
             session$reload()
           }
         }

@@ -1,15 +1,15 @@
 scriptBoxHeaderUI <- function(id) {
   ns <- NS(id)
-  
+
   uiOutput(ns("scriptBoxHeader"))
 }
 
-scriptBoxHeaderServer <- function(id, thisScriptOutInfos, scriptProcessStati, scriptTime, pickedSimu, errFiles) {
+scriptBoxHeaderServer <- function(id, thisScriptOutInfos, thisScriptWorkerStati, scriptProcessStati, scriptTime, pickedSimu, errFiles) {
   moduleServer(
     id,
     function(input, output, session) {
       ns <- session$ns
-      
+
       output$scriptBoxHeader <- renderUI({
         scriptFileName <- unique(thisScriptOutInfos$files$scriptFileName)
         scriptTimeFmt <- ymd_hms(scriptTime)
@@ -36,7 +36,7 @@ scriptBoxHeaderServer <- function(id, thisScriptOutInfos, scriptProcessStati, sc
           )
         )
       })
-      
+
       killCleanupServer("killCleanupButton", thisScriptWorkerStati, pickedSimu, scriptProcessStati, scriptTime)
       downloadWarningsServer("downloadWarningsButton", pickedSimu, errFiles, scriptTime, thisScriptOutInfos)
     }
