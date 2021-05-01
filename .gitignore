@@ -37,3 +37,6 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# Here: Rprofile since it contains local paths.
+.Rprofile
