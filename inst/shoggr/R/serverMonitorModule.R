@@ -59,7 +59,7 @@ serverMonitorServer <- function(id, settingsInput) {
                   render = DT::JS(
                     "function(data, type, row, meta) {",
                     "return type === 'display' && data != null && data.length > 40 ?",
-                    "'<span title=\"' + data + '\">' + data.substr(0, 40) + '...</span>' : data;",
+                    "'<span title=\"' + data + '\">' + '...' + data.substr(-40) + '</span>' : data;",
                     "}")
                 )
               ),
