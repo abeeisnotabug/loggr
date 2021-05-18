@@ -18,7 +18,7 @@ make_Rscript_call <- function(script, simu_log_folder_path, count_explicitly) {
 
   system(
     paste0(
-      "nohup Rscript --vanilla ",  script, " ",
+      "setsid nohup Rscript --vanilla ",  script, " ",
       "--simu_log_folder_path=", simu_log_folder_path, " ",
       "--call_time=", call_time, " ",
       "--count_explicitly=", count_explicitly, " ",
