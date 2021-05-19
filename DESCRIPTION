@@ -1,7 +1,7 @@
 Package: loggr
 Type: Package
 Title: Log Simulations on Multi-Core Machines
-Version: 0.1.0
+Version: 0.1.1
 Author: Maximilian Bee
 Maintainer: Maximilian Bee <richard.maximilian.bee@fsu-jena.de>
 Description: Leightweight function and Shiny App to logg progress in
