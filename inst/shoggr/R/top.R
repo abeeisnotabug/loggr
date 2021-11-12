@@ -11,7 +11,7 @@ top <- function() {
   procs_df <- as.data.frame(procs_mat)
   procs_df[1:11] <- lapply(procs_df[1:11], stringr::str_replace_all, ",", ".")
   procs_df[1:11] <- lapply(procs_df[1:11], utils::type.convert, as.is = TRUE)
-  
+
   procs_df[, c("VIRT", "RES", "SHR")] <- lapply(
     procs_df[, c("VIRT", "RES", "SHR")],
     function(mem_col)
@@ -31,7 +31,7 @@ top <- function() {
   swap_df <- data.frame(type = "swap", mib = mem_mat[2, c(3, 5, 7)], measure = mem_mat[2, c(4, 6, 8)])
 
   mem_df <- rbind(ram_df, swap_df)
-  mem_df$mib <- type.convert(mem_df$mib)
+  mem_df$mib <- type.convert(mem_df$mib, as.is = TRUE)
 
   mem_df$mib[1] - mem_df$mib[3] - mem_df$mib[4]
 

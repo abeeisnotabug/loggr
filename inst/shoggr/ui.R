@@ -19,7 +19,7 @@ dashboardPage(
       menuItem(
         text = "Server Monitor",
         tabName = "serverMonitorTab",
-        icon = icon("dashboard"),
+        icon = icon("tachometer-alt"),
         selected = TRUE
       ),
       menuItem(
