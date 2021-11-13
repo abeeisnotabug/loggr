@@ -11,11 +11,8 @@ simuPickerUI <- function(id) {
     pickerInput(
       inputId = ns("simuPicker"),
       label = "Pick a Simulation",
-      choices = dir(logFolderPath),
-      options = list(`live-search` = TRUE)#,
-      # choicesOpt = list(
-      #   style = rep(sprintf("color: %s", dropDownColor), length(dir(logFolderPath)))
-      # )
+      choices = NULL,
+      options = list(`live-search` = TRUE)
     ),
     makeButton(ns("pickButton"), "Pick", "paper-plane"),
     uiOutput(ns("pickedSimuDisplay"))
@@ -40,6 +37,9 @@ simuPickerServer <- function(id, topLevelSession, topout) {
           }
         )
 
+        doesSimuRun_vec <- unlist(doesSimuRun)
+        simulationOrder <- c(which(doesSimuRun_vec), which(!doesSimuRun_vec))
+
         simuIcons <- ifelse(
           doesSimuRun,
           rep("glyphicon-play", length(doesSimuRun)),
@@ -49,7 +49,7 @@ simuPickerServer <- function(id, topLevelSession, topout) {
         updatePickerInput(
           session = session,
           inputId = "simuPicker",
-          choices = logFolderContents,
+          choices = logFolderContents[simulationOrder],
           selected = if (is.null(pickedSimuBeforeRefresh))
             NULL
           else if (pickedSimuBeforeRefresh %in% logFolderContents)
@@ -57,7 +57,7 @@ simuPickerServer <- function(id, topLevelSession, topout) {
           else
             NULL,
           choicesOpt = list(
-            icon = simuIcons,
+            icon = simuIcons[simulationOrder],
             style = rep(sprintf("color: %s", dropDownColor), length(logFolderContents))
           )
         )
