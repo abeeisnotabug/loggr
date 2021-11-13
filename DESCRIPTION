@@ -10,7 +10,6 @@ Description: Leightweight function and Shiny App to logg progress in
 License: What license is it under?
 Depends: shiny (>= 1.5.0), shinyWidgets (>= 0.5.4), shinyjs (>= 2.0.0), shinydashboard (>= 0.7.1), shinybusy (>= 0.2.2), futile.logger (>= 1.4.3)
 Imports: kableExtra, DT, dplyr, tidyr, stringr, lubridate
-Suggests: futile.logger
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.2
