@@ -38,13 +38,30 @@ mainProgressBarServer <- function(id, scriptOutInfos, combinedIterators, current
           scripts = reactiveValuesToList(processStati$scripts),
           workers = lapply(processStati$workers, shiny::reactiveValuesToList)
         )
-        allProcessStati <- unlist(processStatiList)
-        overallIcon <- if (all(allProcessStati != "N"))
-          icons$R
-        else if (any(allProcessStati != "N"))
-          icons$failure
+
+        scriptAndProgressConsistency <- all(
+          sapply(
+            names(processStatiList$scripts),
+            function(script)
+              ifelse(
+                processStatiList$scripts[[script]] == "N",
+                all(processStatiList$workers[[script]] == "N"),
+                ifelse(
+                  processStatiList$scripts[[script]] %in% c("R", "S"),
+                  all(processStatiList$workers[[script]] %in% c("R", "S")),
+                  FALSE
+                )
+              )
+          )
+        )
+
+        overallIcon <- if (scriptAndProgressConsistency)
+          if (any(unlist(processStatiList$scripts) %in% c("R", "S")))
+            icons$R
+          else
+            icons$N
         else
-          icons$N
+          icons$failure
 
         fluidRow(
           box(
@@ -56,7 +73,7 @@ mainProgressBarServer <- function(id, scriptOutInfos, combinedIterators, current
               total = overallIters,
               display_pct = TRUE,
               status = ifelse(finishedItersSum < overallIters, "primary", "success"),
-              striped = all(allProcessStati != "N"),
+              striped = any(unlist(processStatiList$scripts) %in% c("R", "S")),
               title = span(overallIcon, "Overall progress")
             )
           )
