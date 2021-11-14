@@ -55,13 +55,14 @@ mainProgressBarServer <- function(id, scriptOutInfos, combinedIterators, current
           )
         )
 
-        overallIcon <- if (scriptAndProgressConsistency)
+        overallIcon <- if (scriptAndProgressConsistency) {
           if (any(unlist(processStatiList$scripts) %in% c("R", "S")))
             icons$R
           else
             icons$N
-        else
+        } else {
           icons$failure
+        }
 
         fluidRow(
           box(
