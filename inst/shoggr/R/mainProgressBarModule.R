@@ -47,8 +47,8 @@ mainProgressBarServer <- function(id, scriptOutInfos, combinedIterators, current
                 processStatiList$scripts[[script]] == "N",
                 all(processStatiList$workers[[script]] == "N"),
                 ifelse(
-                  processStatiList$scripts[[script]] %in% c("R", "S"),
-                  all(processStatiList$workers[[script]] %in% c("R", "S")),
+                  processStatiList$scripts[[script]] %in% c("R", "S", "D"),
+                  all(processStatiList$workers[[script]] %in% c("R", "S", "D")),
                   FALSE
                 )
               )
@@ -56,7 +56,7 @@ mainProgressBarServer <- function(id, scriptOutInfos, combinedIterators, current
         )
 
         overallIcon <- if (scriptAndProgressConsistency) {
-          if (any(unlist(processStatiList$scripts) %in% c("R", "S")))
+          if (any(unlist(processStatiList$scripts) %in% c("R", "S", "D")))
             icons$R
           else
             icons$N
