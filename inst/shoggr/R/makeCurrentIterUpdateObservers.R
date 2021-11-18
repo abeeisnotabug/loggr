@@ -19,9 +19,9 @@ makeCurrentIterUpdateObservers <- function(currentWorkerStati, currentStarts, cu
                 sapply(
                   names(startEnd$iteratorValues),
                   function(iteratorName) {
-                    whichStep <- which(
+                    whichStep <- unname(which(
                       scriptOutInfos[[scriptTime]]$iterators[[iteratorName]] == startEnd$iteratorValues[[iteratorName]]
-                    )
+                    ))
 
                     if (length(whichStep) < 1) {
                       shinyWidgets::sendSweetAlert(
