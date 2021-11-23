@@ -120,7 +120,8 @@ cat_initialize_progress <- function(command_args, call_time, parent_id, raw_list
       )
     ),
     sep = "\n"
-  )
+  ),
+  fill = FALSE
 }
 
 logg_iteration <- function(status, start_time, parent_id, worker_id, it_count, raw_list, raw_values, file) {
