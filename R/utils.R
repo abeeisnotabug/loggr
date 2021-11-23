@@ -112,16 +112,15 @@ cat_initialize_progress <- function(command_args, call_time, parent_id, raw_list
   cat(
     prefix(
       paste(
-        paste(list(command_args)),        # call
-        call_time,                        # callTime
-        parent_id,                        # parentPID
-        paste_vars(raw_list, raw_values), # vars
+        paste(list(command_args)),                        # call
+        call_time,                                        # callTime
+        parent_id,                                        # parentPID
+        gsub("\n", "", paste_vars(raw_list, raw_values)), # vars
         sep = ";"
       )
     ),
     sep = "\n"
-  ),
-  fill = FALSE
+  )
 }
 
 logg_iteration <- function(status, start_time, parent_id, worker_id, it_count, raw_list, raw_values, file) {
